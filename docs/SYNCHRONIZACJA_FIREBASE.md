@@ -11,24 +11,15 @@ Wersja: 1.1 (2026-10-08).
 
 ## Co MUSI zrobić administrator, zanim synchronizacja zadziała
 
-Wygenerowany bez konfiguracji Firebase APK nadal działa lokalnie. Chmura wyświetla wtedy „Synchronizacja nie jest jeszcze skonfigurowana”. **Nie da się uzyskać faktycznej synchronizacji bez utworzenia zewnętrznego projektu Firebase i wdrożenia reguł.**
+**Konfiguracja Androida Firebase jest już przygotowana** dla projektu `kalendarz-8f0cb` i pakietu `pl.mojeroboty.app`. Publiczne identyfikatory zostały zapisane w `firebase-project.properties`. Samo przygotowanie APK nie włącza Authentication ani nie tworzy bazy Firestore — te usługi i reguły zabezpieczeń należy skonfigurować w Firebase Console.
 
 1. Wejdź na https://console.firebase.google.com i utwórz projekt (np. \`moje-roboty-ekipa\`). Poznaj ewentualne limity i koszty Cloud Firestore.
 2. Dodaj w Firebase aplikację Android o **package name** \`pl.mojeroboty.app\`.
 3. W **Authentication → Sign-in method** włącz **Email/Password**. Użytkownicy powinni używać silnych, unikatowych haseł.
 4. W **Firestore Database** utwórz bazę w wybranym regionie (najlepiej blisko użytkowników, zgodnie z wymaganiami prywatności). Wybierz zabezpieczone reguły, nie „public test mode”.
 5. Otwórz Firestore → **Rules** i **opublikuj dokładnie zawartość** [../firestore.rules](../firestore.rules). Reguły ograniczają dostęp do UID dodanych do ekipy.
-6. W ustawieniach aplikacji Android projektu Firebase odczytaj:
-   - **Web API key** (np. pole \`api_key.current_key\` z \`google-services.json\`) → \`FIREBASE_API_KEY\`;
-   - **Mobilesdk app ID** (np. \`mobilesdk_app_id\`) → \`FIREBASE_APP_ID\`;
-   - **Project ID** (np. \`project_info.project_id\`) → \`FIREBASE_PROJECT_ID\`.
-7. Umieść je w **lokalnym, niecommitowanym** \`local.properties\` w katalogu repozytorium:
-   \`\`\`properties
-   FIREBASE_API_KEY=twoj_klucz
-   FIREBASE_APP_ID=1:123456789:android:abcdefghijkl
-   FIREBASE_PROJECT_ID=twoj-projekt
-   \`\`\`
-   Alternatywnie ustaw identyczne zmienne środowiskowe \`FIREBASE_API_KEY\`, \`FIREBASE_APP_ID\`, \`FIREBASE_PROJECT_ID\` w systemie budującym.
+6. Plik przesłany przez właściciela został wykorzystany do przygotowania **publicznych identyfikatorów klienta Firebase** w `firebase-project.properties`. Build korzysta z tych wartości automatycznie, chyba że ustawisz własne niepuste `FIREBASE_*` w środowisku lub w lokalnym `local.properties`.
+7. Nie umieszczaj w GitHub żadnych haseł, kluczy administracyjnych, plików kont usługowych ani danych klientów. Według [oficjalnej dokumentacji Firebase](https://firebase.google.com/docs/projects/api-keys) klucz klienta Firebase jest publicznym identyfikatorem i nie nadaje dostępu do bazy. Dostęp chronią reguły Firestore i Firebase Auth; w Google Cloud sprawdź ograniczenia klucza do usług Firebase.
 8. Skompiluj i zainstaluj **tę samą wersję APK** na obu telefonach. Każdy build udostępniany ekipie musi wskazywać ten sam projekt Firebase.
 9. Zadbaj o ograniczenia dostępu klucza Android API w Google Cloud, prawidłową konfigurację Authentication (w tym wymagane przez aktualną wersję SDK zabezpieczenia), a przed publiczną dystrybucją włącz App Check. Same klucze API nie zastępują reguł bezpieczeństwa.
 

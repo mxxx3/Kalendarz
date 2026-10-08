@@ -9,8 +9,14 @@ val localFirebase = Properties().apply {
     val configuration = rootProject.file("local.properties")
     if (configuration.exists()) configuration.inputStream().use { load(it) }
 }
+// Public Firebase Android client configuration; environment and local overrides take precedence.
+val projectFirebase = Properties().apply {
+    val configuration = rootProject.file("firebase-project.properties")
+    if (configuration.exists()) configuration.inputStream().use { load(it) }
+}
 fun firebaseSetting(name: String): String =
-    (System.getenv(name) ?: localFirebase.getProperty(name) ?: "").trim()
+    listOf(System.getenv(name), localFirebase.getProperty(name), projectFirebase.getProperty(name))
+        .firstOrNull { !it.isNullOrBlank() }?.trim().orEmpty()
 fun gradleString(value: String): String = "\""+value.replace("\\","\\\\").replace("\"","\\\"")+"\""
 
 

@@ -1,3 +1,5 @@
+> **Konfiguracja Android Firebase:** plik klienta projektu `kalendarz-8f0cb` został dostarczony i użyty do ustawienia identyfikatorów klienta w `firebase-project.properties`. Nie dowodzi to włączenia Firebase Authentication, istnienia Firestore ani publikacji reguł. Synchronizację dwóch urządzeń należy przetestować po wykonaniu [instrukcji konfiguracji](SYNCHRONIZACJA_FIREBASE.md).
+
 > **Aktualizacja 1.1:** Dodano opcjonalny kod współdzielonej ekipy (Firebase Auth, Firestore, członkostwo UID, zapisy i odczyt realtime, import lokalnych danych do nowej ekipy). Działa wyłącznie po zewnętrznej konfiguracji Firebase i publikacji [reguł](../firestore.rules). CI potwierdza jedynie kompilację/testy jednostkowe; **nie przeprowadzono jeszcze testu synchronizacji między dwoma prawdziwymi kontami w skonfigurowanym Firebase**. Konfiguracja i wymagane testy: [SYNCHRONIZACJA_FIREBASE.md](SYNCHRONIZACJA_FIREBASE.md).
 
 # Stan implementacji Android (2026-10-08)
