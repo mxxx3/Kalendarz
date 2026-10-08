@@ -1,6 +1,8 @@
 package pl.mojeroboty.app
 
 import android.app.DatePickerDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -156,8 +158,15 @@ private fun WorkApp(store: AppStore) {
                                 modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                                 Column(Modifier.padding(16.dp)) {
                                     Text(c.name, fontWeight = FontWeight.Bold)
-                                    if(c.phone.isNotBlank()) Text(c.phone)
+                                    if(c.phone.isNotBlank()) {
+                                        TextButton(onClick = {
+                                            context.startActivity(Intent(Intent.ACTION_DIAL,
+                                                Uri.parse("tel:" + Uri.encode(c.phone))))
+                                        }) { Text("Zadzwoń: " + c.phone) }
+                                    }
                                     if(c.address.isNotBlank()) Text(c.address)
+                                    Text("Saldo klienta: " + money(snapshot.jobs.filter { it.clientId == c.id }
+                                        .sumOf { snapshot.remaining(it).coerceAtLeast(0) }))
                                     Text("Robót: " + snapshot.jobs.count { it.clientId == c.id } +
                                         if(c.archived) " · Archiwum" else "",
                                         style = MaterialTheme.typography.bodySmall)
