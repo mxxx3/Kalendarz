@@ -65,11 +65,26 @@ class CloudSync(context: Context) {
     private var jobsReady = false
     private var clientsReady = false
     private var paymentsReady = false
+    private var jobsCached = false
+    private var clientsCached = false
+    private var paymentsCached = false
 
     init {
         val savedWorkspace = preferences.getString("workspaceId", "").orEmpty()
-        if (savedWorkspace.isNotBlank() && auth?.currentUser != null) {
-            scope.launch { runCatching { join(savedWorkspace) }.onFailure { setError(it) } }
+        if (savedWorkspace.isNotBlank() && auth?.currentUser != null &&
+            preferences.getString("boundUid", "") == auth.currentUser?.uid) {
+            scope.launch {
+                runCatching { join(savedWorkspace) }.onFailure { cause ->
+                    // After a previously authorized session, allow offline restoration
+                    // from Firestore's own cache for the same authenticated UID.
+                    runCatching {
+                        val cached = workspace(savedWorkspace).get(Source.CACHE).await()
+                        val users = cached.get("memberUids") as? List<*> ?: emptyList<Any>()
+                        require(auth.currentUser?.uid in users) { "Brak lokalnie potwierdzonego członkostwa." }
+                        activate(cached, savedWorkspace, true)
+                    }.onFailure { setError(cause) }
+                }
+            }
         }
     }
 
@@ -120,16 +135,21 @@ class CloudSync(context: Context) {
             val doc = workspace(safeId).get(Source.SERVER).await()
             val users = doc.get("memberUids") as? List<*> ?: error("Nie ma takiej ekipy.")
             require(uid in users) { "Właściciel musi najpierw dodać Twój identyfikator użytkownika." }
-            stopListeners()
-            preferences.edit().putString("workspaceId", safeId).apply()
-            mutableStatus.value = mutableStatus.value.copy(
-                connected = true, loading = true, workspaceId = safeId,
-                owner = (doc.getString("ownerId") == uid), error = "", fromCache = false)
-            observe(safeId)
+            activate(doc, safeId, false)
         } catch (e: Exception) {
             mutableStatus.value = mutableStatus.value.copy(loading = false)
             throw e
         }
+    }
+
+    private fun activate(doc: DocumentSnapshot, id: String, cached: Boolean) {
+        stopListeners()
+        val uid = requireAuth()
+        preferences.edit().putString("workspaceId", id).putString("boundUid", uid).apply()
+        mutableStatus.value = mutableStatus.value.copy(
+            connected = true, loading = true, workspaceId = id,
+            owner = doc.getString("ownerId") == uid, error = "", fromCache = cached)
+        observe(id)
     }
 
     private fun observe(id: String) {
@@ -156,7 +176,7 @@ class CloudSync(context: Context) {
                         d.getString("status") ?: "PLANNED", d.getString("clientId"),
                         d.getString("address").orEmpty(), d.getString("notes").orEmpty())
                 }.sortedBy { it.start }
-                jobsReady = true; publish(value.metadata.isFromCache)
+                jobsReady = true; jobsCached = value.metadata.isFromCache; publish()
             } catch (e: Exception) { setError(e) }
         })
         registrations.add(doc.collection("clients").addSnapshotListener(MetadataChanges.INCLUDE) { value, error ->
@@ -168,7 +188,7 @@ class CloudSync(context: Context) {
                         d.getString("address").orEmpty(), d.getString("notes").orEmpty(),
                         d.getBoolean("archived") ?: false)
                 }.sortedBy { it.name }
-                clientsReady = true; publish(value.metadata.isFromCache)
+                clientsReady = true; clientsCached = value.metadata.isFromCache; publish()
             } catch (e: Exception) { setError(e) }
         })
         registrations.add(doc.collection("payments").addSnapshotListener(MetadataChanges.INCLUDE) { value, error ->
@@ -180,14 +200,15 @@ class CloudSync(context: Context) {
                         d.getLong("cents") ?: 0L, LocalDate.parse(d.getString("paidAt")),
                         d.getString("method") ?: "Gotówka", d.getString("notes").orEmpty())
                 }.sortedByDescending { it.paidAt }
-                paymentsReady = true; publish(value.metadata.isFromCache)
+                paymentsReady = true; paymentsCached = value.metadata.isFromCache; publish()
             } catch (e: Exception) { setError(e) }
         })
     }
 
-    private fun publish(cached: Boolean) {
+    private fun publish() {
         val ready = jobsReady && clientsReady && paymentsReady
-        mutableStatus.value = mutableStatus.value.copy(loading = !ready, fromCache = cached)
+        mutableStatus.value = mutableStatus.value.copy(loading = !ready,
+            fromCache = jobsCached || clientsCached || paymentsCached)
         if (ready) mutableSnapshot.value = Snapshot(jobList, clientList, paymentList, true)
     }
 
@@ -195,13 +216,14 @@ class CloudSync(context: Context) {
         registrations.forEach { it.remove() }
         registrations.clear()
         jobsReady = false; clientsReady = false; paymentsReady = false
+        jobsCached = false; clientsCached = false; paymentsCached = false
         jobList = emptyList(); clientList = emptyList(); paymentList = emptyList()
         mutableSnapshot.value = Snapshot()
     }
 
     fun disconnect() {
         stopListeners()
-        preferences.edit().remove("workspaceId").apply()
+        preferences.edit().remove("workspaceId").remove("boundUid").apply()
         mutableStatus.value = mutableStatus.value.copy(
             connected = false, workspaceId = "", owner = false, loading = false, fromCache = false)
     }
