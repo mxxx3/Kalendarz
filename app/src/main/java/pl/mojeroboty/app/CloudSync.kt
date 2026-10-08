@@ -72,7 +72,7 @@ class CloudSync(context: Context) {
     init {
         val savedWorkspace = preferences.getString("workspaceId", "").orEmpty()
         if (savedWorkspace.isNotBlank() && auth?.currentUser != null &&
-            preferences.getString("boundUid", "") == auth.currentUser?.uid) {
+            preferences.getString("boundUid", "") == auth?.currentUser?.uid) {
             scope.launch {
                 runCatching { join(savedWorkspace) }.onFailure { cause ->
                     // After a previously authorized session, allow offline restoration
