@@ -101,7 +101,7 @@ fun segments(jobs: List<Job>, weekStart: LocalDate): List<Segment> {
             var lane = occupied.indexOfFirst { used -> cols.none { it in used } }
             if (lane == -1) { occupied.add(mutableSetOf()); lane = occupied.lastIndex }
             occupied[lane].addAll(cols)
-            Segment(job, a, length, lane, job.start < weekStart, job.end > last)
+            Segment(job, a, length, lane, startsBefore = job.start.isBefore(weekStart), endsAfter = job.end.isAfter(last))
         }.toList()
 }
 
