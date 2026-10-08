@@ -10,6 +10,7 @@ Repozytorium projektu aplikacji do planowania robót jednodniowych i wielodniowy
 4. [Scenariusze użytkownika](docs/SCENARIUSZE.md) — 20 przykładów od dodania pracy po backup.
 5. [Plan realizacji krok po kroku](docs/PLAN_REALIZACJI.md) — fazy 0–6 i checklisty programistyczne.
 6. [Testy i kryteria odbioru](docs/TESTY.md) — kontrola poprawności, offline, walidacja, pieniądze i UI.
+7. [Kontrakt implementacyjny](docs/KONTRAKT_IMPLEMENTACYJNY.md) — szczegółowe reguły działania, przypadki graniczne i lista kontroli przed wydaniem APK.
 
 ## Pierwszy krok implementacji
 
