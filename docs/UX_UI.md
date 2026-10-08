@@ -15,7 +15,7 @@ Dolna nawigacja: **Kalendarz**, **Roboty**, **Klienci**, **Finanse**. Ikona usta
 | Szczegóły roboty | Termin, klient, adres, status, kwota, suma wpłat, pozostało | Edytuj / Dodaj wpłatę |
 | Roboty | Nadchodzące, wszystkie, zakończone, anulowane | Szukaj i filtruj |
 | Klienci | Nazwa, telefon, historia zleceń, saldo | Nowy klient |
-| Finanse | Umówione, otrzymane, do otrzymania per waluta | Filtr okresu |
+| Finanse | Umówione, otrzymane, do otrzymania w EUR | Filtr okresu |
 | Ustawienia | Motyw, waluta, kopia zapasowa i import | Eksport danych |
 
 ## 3. Projekt ekranu kalendarza
@@ -48,10 +48,10 @@ Nagłówek: dzień tygodnia + pełna data. Karty na liście: nazwa, klient, loka
 3. Wybierz zakres **Od** i **Do** (domyślnie oba = data wybranego dnia albo dziś).
 4. Wpisz **kwotę za całą robotę**, np. „2600,00”. Przy kwocie musi być podpis „Za całe zlecenie (nie za dzień)”.
 5. Tap „Zapisz”. Zapis jest trwały lokalnie, a kalendarz od razu się aktualizuje.
-6. Sekcja „Więcej szczegółów” rozwija pola: klient/nowy klient, adres, notatka, godzina, waluta, status, kolor.
+6. Sekcja „Więcej szczegółów” rozwija pola: klient/nowy klient, adres, notatka, godzina, status, kolor.
 7. Jeśli wybrano okres z innymi robotami, wyświetl nienachalny komunikat „Nakłada się z: …” i akcję „Zapisz mimo to”.
 
-**Walidacje:** niepusta nazwa po trim, data końca >= początku, poprawna kwota >= 0, kontrola przepełnienia Long i precyzji waluty. Pusta kwota musi mieć jawnie ustaloną semantykę: w MVP pole wymagane, ale 0 oznacza jeszcze niewycenione; UI oznacza „Wycena do ustalenia”, a w raporcie nie przedstawia jej jako pewnego przychodu. Wybór waluty z kodów ISO 4217; dla EUR dwie cyfry groszy/centów. Przypadkowy Back przy zmianach = dialog „Odrzucić zmiany?”.
+**Walidacje:** niepusta nazwa po trim, data końca >= początku, poprawna kwota >= 0, kontrola przepełnienia Long i precyzji waluty. Pusta kwota musi mieć jawnie ustaloną semantykę: w MVP pole wymagane, ale 0 oznacza jeszcze niewycenione; UI oznacza „Wycena do ustalenia”, a w raporcie nie przedstawia jej jako pewnego przychodu. Jedyna waluta EUR; kwoty z dwoma cyframi centów. Przypadkowy Back przy zmianach = dialog „Odrzucić zmiany?”.
 
 ## 5. Szczegóły zlecenia
 Widok „Remont łazienki”: 13–16 października (4 dni kalendarzowe), status „W trakcie”, klient i telefon, adres, notatka, kwota umówiona 2600 EUR, wpłacono 500 EUR, pozostało 2100 EUR. Przyciski: **Edytuj**, **Dodaj wpłatę**, **Zmień status**. Menu dodatkowe: duplikuj z wyborem nowych dat, anuluj, usuń z potwierdzeniem. „Zrobione” **nie zmienia** salda na zero. Kwota ujemnego salda = nadpłata i wymaga czytelnego oznaczenia.
@@ -63,14 +63,14 @@ Widok „Remont łazienki”: 13–16 października (4 dni kalendarzowe), status
 - **Częściowa zapłata:** szczegóły -> dodaj wpłatę -> kwota/data/metoda -> zapisz -> odświeżone saldo.
 - **Odnalezienie klienta:** Klienci -> szukaj -> karta -> wszystkie zlecenia i należności -> opcjonalnie otwórz telefon w dialerze.
 - **Powrót po miesiącu:** uruchom aplikację offline -> wszystkie wpisy pozostają; kalendarz pokazuje aktualny okres, preferowany tryb zachowany.
-- **Bezpieczny eksport:** ustawienia -> eksport -> systemowy wybór lokalizacji -> komunikat o wyniku; import: wybór pliku -> podgląd liczby rekordów i walut -> potwierdzenie zastąpienia -> transakcja/rollback.
+- **Bezpieczny eksport:** ustawienia -> eksport -> systemowy wybór lokalizacji -> komunikat o wyniku; import: wybór pliku -> potwierdzenie i podgląd kopii -> potwierdzenie zastąpienia -> transakcja/rollback.
 
 ## 7. Sytuacje trudne (obowiązkowe)
 - Praca zaczęta przed początkiem widocznego miesiąca; praca kończąca się po miesiącu; 31 grudnia -> styczeń; 29 lutego.
 - Praca jednodniowa; zero robót; 15 robót jednego dnia; 1000 zapisanych robót.
 - Zmiana orientacji, zamknięcie procesu podczas formularza, duża czcionka 200%, ekran szerokości 360dp.
 - Mało miejsca: bez poziomego obcinania całego kalendarza; skróty nazw, lista dnia i dostępność zamiast mikroskopijnego tekstu.
-- Brak internetu, odmowa uprawnień, duża liczba wpłat, uszkodzony import, waluty EUR.
+- Brak internetu, odmowa uprawnień, duża liczba wpłat, uszkodzony import, walutę EUR.
 - Anulowanie nie usuwa historii; archiwizacja klienta nie usuwa jego robót.
 - Walidacja zakresów przed zapisem, a nadmierna liczba dni nie może zawieszać UI.
 
@@ -88,12 +88,12 @@ Widok „Remont łazienki”: 13–16 października (4 dni kalendarzowe), status
 - [ ] Kliknięcie w dzień pokazuje **wszystkie** prace obejmujące dzień, także zaczęte wcześniej.
 - [ ] Wyświetlana kwota jest za **całą** robotę, nie mnożona przez liczbę dni.
 - [ ] „+N więcej” nie ukrywa bezpowrotnie żadnego zlecenia.
-- [ ] Dzień, tydzień i miesiąc pokazują spójne dane z Room.
+- [ ] Dzień, tydzień i miesiąc pokazują spójne dane z lokalnego SQLite.
 - [ ] Do zapisania pracy wystarczy nazwa, zakres dat i kwota (zero dopuszczone).
 - [ ] Saldo poprawne po wpłacie i oznaczeniu jako „Zrobione”.
 - [ ] Obsługa bez internetu, duży tekst i TalkBack sprawdzone na urządzeniu.
 
 ## 10. Priorytet implementacji
-Pierwsze demo: **Room + dodaj robotę + kalendarz tygodnia z poprawnymi paskami + szczegóły**. Następnie miesiąc, dzień, klienci, finanse, backup i testy. Nie zaczynaj od synchronizacji, faktur czy przeciągania pasków: nie są konieczne do podstawowego celu.
+Pierwsze demo: **lokalny SQLite + dodaj robotę + kalendarz tygodnia z poprawnymi paskami + szczegóły**. Następnie miesiąc, dzień, klienci, finanse, backup i testy. Nie zaczynaj od synchronizacji, faktur czy przeciągania pasków: nie są konieczne do podstawowego celu.
 
 Powiązania: [scenariusze](SCENARIUSZE.md), [plan implementacji](PLAN_REALIZACJI.md), [testy](TESTY.md).
