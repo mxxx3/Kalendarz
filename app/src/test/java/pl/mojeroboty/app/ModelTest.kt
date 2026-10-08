@@ -26,7 +26,7 @@ class ModelTest {
         assertEquals(3,result.size)
         assertNotEquals(result.first { it.job.id=="a" }.lane,
             result.first { it.job.id=="b" }.lane)
-        assertEquals(1, result.first { it.job.id=="c" }.span+(-1))
+        assertEquals(2, result.first { it.job.id=="c" }.span)
     }
 
     @Test fun jobAcrossYearAppearsInBothWeeks() {
