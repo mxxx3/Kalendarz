@@ -26,6 +26,7 @@ data class SharedStatus(
     val email: String = "",
     val workspaceId: String = "",
     val owner: Boolean = false,
+    val memberUids: List<String> = emptyList(),
     val connected: Boolean = false,
     val loading: Boolean = false,
     val fromCache: Boolean = false,
@@ -148,7 +149,9 @@ class CloudSync(context: Context) {
         preferences.edit().putString("workspaceId", id).putString("boundUid", uid).apply()
         mutableStatus.value = mutableStatus.value.copy(
             connected = true, loading = true, workspaceId = id,
-            owner = doc.getString("ownerId") == uid, error = "", fromCache = cached)
+            owner = doc.getString("ownerId") == uid,
+            memberUids = (doc.get("memberUids") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
+            error = "", fromCache = cached)
         observe(id)
     }
 
@@ -162,7 +165,8 @@ class CloudSync(context: Context) {
                     disconnect()
                 } else {
                     mutableStatus.value = mutableStatus.value.copy(
-                        owner = value.getString("ownerId") == auth?.currentUser?.uid)
+                        owner = value.getString("ownerId") == auth?.currentUser?.uid,
+                        memberUids = (users ?: emptyList<Any>()).filterIsInstance<String>())
                 }
             }
         })
@@ -225,7 +229,8 @@ class CloudSync(context: Context) {
         stopListeners()
         preferences.edit().remove("workspaceId").remove("boundUid").apply()
         mutableStatus.value = mutableStatus.value.copy(
-            connected = false, workspaceId = "", owner = false, loading = false, fromCache = false)
+            connected = false, workspaceId = "", owner = false,
+            memberUids = emptyList(), loading = false, fromCache = false)
     }
 
     fun logout() {
@@ -239,6 +244,12 @@ class CloudSync(context: Context) {
         val uid = otherUid.trim()
         require(Regex("[a-zA-Z0-9]{15,150}").matches(uid)) { "Nieprawidłowe UID." }
         selectedWorkspace().update("memberUids", FieldValue.arrayUnion(uid)).await()
+    }
+
+    suspend fun removeMember(otherUid: String) {
+        require(mutableStatus.value.owner) { "Tylko właściciel może odebrać dostęp." }
+        require(otherUid != requireAuth()) { "Nie można usunąć właściciela." }
+        selectedWorkspace().update("memberUids", FieldValue.arrayRemove(otherUid)).await()
     }
 
     private fun jobMap(j: Job): Map<String, Any?> = mapOf(
