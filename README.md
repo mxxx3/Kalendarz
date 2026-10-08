@@ -6,9 +6,10 @@ Repozytorium projektu aplikacji do planowania robót jednodniowych i wielodniowy
 
 1. [Pełna specyfikacja produktu](docs/SPECYFIKACJA.md) — funkcje, ekrany, logika biznesowa, podział MVP/V1.
 2. [Architektura i algorytm kalendarza](docs/ARCHITEKTURA.md) — model bazy, paski wielodniowe, finanse i komponenty.
-3. [Scenariusze użytkownika](docs/SCENARIUSZE.md) — 20 przykładów od dodania pracy po backup.
-4. [Plan realizacji krok po kroku](docs/PLAN_REALIZACJI.md) — fazy 0–6 i checklisty programistyczne.
-5. [Testy i kryteria odbioru](docs/TESTY.md) — kontrola poprawności, offline, walidacja, pieniądze i UI.
+3. [Dokładny projekt UX/UI i obsługi kalendarza](docs/UX_UI.md) — zachowanie ekranów, dodawanie robót, przecięcia terminów i zasady czytelności.
+4. [Scenariusze użytkownika](docs/SCENARIUSZE.md) — 20 przykładów od dodania pracy po backup.
+5. [Plan realizacji krok po kroku](docs/PLAN_REALIZACJI.md) — fazy 0–6 i checklisty programistyczne.
+6. [Testy i kryteria odbioru](docs/TESTY.md) — kontrola poprawności, offline, walidacja, pieniądze i UI.
 
 ## Pierwszy krok implementacji
 
