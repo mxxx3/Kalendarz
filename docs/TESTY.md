@@ -14,7 +14,7 @@ Powiązanie: [specyfikacja](SPECYFIKACJA.md), [plan](PLAN_REALIZACJI.md).
 - [ ] `endDate < startDate` odrzucane, tytuł whitespace odrzucany.
 - [ ] Wartości pieniężne: 0, 0.01, duże wartości, zaokrąglanie i przecinek polski.
 - [ ] 260000 groszy - 50000 - 210000 = 0; status DONE nie zmienia salda.
-- [ ] PLN i EUR nigdy nie są sumowane ze sobą.
+- [ ] EUR nigdy są liczone poprawnie.
 - [ ] Kwota umówiona całego zlecenia zliczana tylko raz, wg daty startu.
 - [ ] Płatność przypisana do daty zapłaty, nie początku zlecenia.
 - [ ] CANCELLED wykluczone z aktywnej kwoty planu, zachowane w historii.
