@@ -9,7 +9,7 @@ Osobisty organizer zleceń budowlanych, remontowych i serwisowych. Najważniejsz
 - Każde zlecenie ma jeden rekord, nawet jeśli trwa kilkanaście dni; cena to kwota za całość, a nie za dzień.
 - Roboty mogą się nakładać. Konflikt pokazuje ostrzeżenie, lecz nie blokuje zapisu.
 - Status wykonania i status zapłaty są odrębne.
-- Obsługa po polsku; domyślna waluta PLN, możliwa EUR; kalendarz od poniedziałku.
+- Obsługa po polsku; waluta EUR (€); kalendarz od poniedziałku.
 - Brak przesyłania danych klientów w sieci; ręczny eksport kopii jest świadomą czynnością użytkownika.
 
 ## Nawigacja
@@ -36,7 +36,7 @@ Imię/nazwa (wymagane), telefon, adres i notatki. Powiązane roboty i saldo nale
 Zakładki Nadchodzące/Wszystkie/Zakończone/Anulowane; filtry zakresu dat, statusu, klienta i niezapłaconych; wyszukiwanie w nazwie, adresie, kliencie oraz opisie. Sortuj datą i wartością. Stan pusty zawiera możliwość dodania zlecenia.
 
 ## Finanse
-Kwota umówiona każdej roboty liczona raz według daty rozpoczęcia. Zapłaty liczone według daty otrzymania. Saldo = umówiona kwota minus wpłaty. Zrobienie roboty nie oznacza zapłaty. Raport okresowy pokazuje wartość aktywnych zleceń, zakończonych robót, otrzymane pieniądze i zaległości. Nie dodawaj PLN do EUR; raporty osobno per waluta. Nadpłaty oznacz osobno.
+Kwota umówiona każdej roboty liczona raz według daty rozpoczęcia. Zapłaty liczone według daty otrzymania. Saldo = umówiona kwota minus wpłaty. Zrobienie roboty nie oznacza zapłaty. Raport okresowy pokazuje wartość aktywnych zleceń, zakończonych robót, otrzymane pieniądze i zaległości. Nie dodawaj różnych walut; raporty w EUR. Nadpłaty oznacz osobno.
 
 ## Ustawienia, dane, bezpieczeństwo
 Motyw systemowy/jasny/ciemny, domyślna waluta, eksport/import danych i kopie zapasowe. Kopia JSON ma numer wersji schematu i zawiera roboty, klientów, płatności oraz relacje. Import: podgląd, walidacja i zapis transakcyjny albo rollback. Preferowany import „zastąp obecną bazę” z wyraźnym potwierdzeniem. Wybór pliku przez Android Storage Access Framework. Żadnych niepotrzebnych uprawnień pamięci.
