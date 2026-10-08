@@ -16,7 +16,7 @@
 14. **Offline.** W trybie samolotowym dodawanie, edycja i raporty działają.
 15. **Nieznana wycena.** Dodaj cenę 0 i zmień ją później.
 16. **Anulowanie.** Anulowana robota pozostaje w historii, lecz nie w aktywnym planie przychodów.
-17. **Waluta EUR.** Zapisz roboty w EUR; raport ma jeden raport w EUR.
+17. **Waluta EUR.** Zapisz roboty w EUR; raport używa wyłącznie euro.
 18. **Błędne daty.** Data końca przed datą początku daje błąd i nie zapisuje zlecenia.
 19. **Wznowienie.** Obróć ekran w trakcie formularza; wartości wprowadzane pozostają.
 20. **Dostępność.** Przy powiększonej czcionce i TalkBack paski i detale pozostają używalne.
