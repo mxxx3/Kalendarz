@@ -2,7 +2,7 @@
 
 Natywna aplikacja w języku polskim do planowania robót remontowych, usług i prac wielodniowych. Jedno zlecenie obejmuje dowolny zakres dat i ma **jedną cenę za całość w EUR**, niezależnie od liczby dni.
 
-**Stan na 8 października 2026:** kod źródłowy aplikacji jest w repozytorium. Nie wykonano jeszcze potwierdzonej kompilacji APK i testów na urządzeniu w tej sesji. Aby nie sugerować gotowego produktu, postęp i ograniczenia są opisane w [statusie implementacji](docs/STATUS_IMPLEMENTACJI.md).
+**Stan na 8 października 2026:** APK debug został zbudowany, a testy jednostkowe zaliczone w [GitHub Actions](https://github.com/mxxx3/Kalendarz/actions/runs/37772445338). Test instalacji na fizycznym Androidzie i testy UI pozostają do wykonania. Szczegóły w [statusie implementacji](docs/STATUS_IMPLEMENTACJI.md).
 
 ## Funkcje w kodzie
 
@@ -25,7 +25,7 @@ Natywna aplikacja w języku polskim do planowania robót remontowych, usług i p
 5. Uruchom `gradle :app:testDebugUnitTest :app:assembleDebug`.
 6. APK debug (gdy kompilacja się powiedzie): `app/build/outputs/apk/debug/app-debug.apk`.
 
-Po pomyślnym przebiegu workflow **Android APK and tests** w zakładce GitHub Actions dostępny będzie artefakt **MojeRoboty-debug-apk**. Artefakt pojawi się wyłącznie przy udanym buildzie; nie jest tu załączony gotowy, sprawdzony APK.
+Potwierdzony sukces: [GitHub Actions 37772445338](https://github.com/mxxx3/Kalendarz/actions/runs/37772445338) → artefakt **MojeRoboty-debug-apk** zawierający `app-debug.apk`. Jest to wersja debug do samodzielnej instalacji, nie podpisane wydanie sklepowe. Przetestowany kod jest scalony z gałęzią `main`.
 
 ## Gdzie zacząć w kodzie
 
