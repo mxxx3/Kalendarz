@@ -183,7 +183,7 @@ private fun WorkApp(store: AppStore) {
             }
         }
     }
-    if(showForm) JobForm(formJob, LocalDate.parse(selected), snapshot.clients,
+    if(showForm) JobForm(formJob, LocalDate.parse(selected), snapshot.clients, snapshot.jobs,
         onCancel = { showForm = false },
         onSave = { save(it); showForm = false })
     if(showClientForm) ClientForm(clientForm, onCancel = { showClientForm = false },
@@ -247,7 +247,7 @@ fun ChooseDate(label: String, date: LocalDate, change: (LocalDate) -> Unit) {
 }
 
 @Composable
-private fun JobForm(initial: Job?, day: LocalDate, clients: List<Client>,
+private fun JobForm(initial: Job?, day: LocalDate, clients: List<Client>, jobs: List<Job>,
     onCancel: () -> Unit, onSave: (Job) -> Unit
 ) {
     var name by rememberSaveable(initial?.id) { mutableStateOf(initial?.title ?: "") }
@@ -262,6 +262,11 @@ private fun JobForm(initial: Job?, day: LocalDate, clients: List<Client>,
     var status by rememberSaveable(initial?.id) { mutableStateOf(initial?.status ?: "PLANNED") }
     var more by rememberSaveable { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
+    var acceptConflict by remember { mutableStateOf(false) }
+    val conflicts = jobs.filter { j ->
+        j.id != initial?.id && j.status != "CANCELLED" &&
+            intersects(j, LocalDate.parse(start), LocalDate.parse(end))
+    }
     AlertDialog(onDismissRequest = onCancel,
         title = { Text(if(initial == null) "Dodaj robotę" else "Edytuj robotę") },
         text = { Column(Modifier.heightIn(max=480.dp).verticalScroll(rememberScrollState()),
@@ -294,6 +299,14 @@ private fun JobForm(initial: Job?, day: LocalDate, clients: List<Client>,
                         label = { Text(label) })
                 }
             }
+            if(conflicts.isNotEmpty()) {
+                Text("Uwaga: ten termin nakłada się na: " +
+                    conflicts.joinToString { it.title }, color = MaterialTheme.colorScheme.error)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = acceptConflict, onCheckedChange = { acceptConflict = it })
+                    Text("Zapisz mimo kolizji")
+                }
+            }
             if(error.isNotEmpty()) Text(error, color = MaterialTheme.colorScheme.error)
         } },
         confirmButton = { Button(onClick = {
@@ -301,6 +314,9 @@ private fun JobForm(initial: Job?, day: LocalDate, clients: List<Client>,
                 require(name.isNotBlank()) { "Podaj nazwę roboty." }
                 require(LocalDate.parse(end) >= LocalDate.parse(start)) {
                     "Data końca jest wcześniejsza niż początek."
+                }
+                require(conflicts.isEmpty() || acceptConflict) {
+                    "Potwierdź zapis mimo kolizji terminów."
                 }
                 val cents = parseEuro(price)
                 onSave(Job(initial?.id ?: AppStore.newId(),name.trim(),
