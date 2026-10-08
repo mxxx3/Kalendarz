@@ -23,7 +23,7 @@ Wybór **Miesiąc / Tydzień / Dzień**, przyciski poprzedni/następny okres ora
 Dotknięcie dnia otwiera listę robót; dotknięcie paska szczegóły. Dotknięcie pustego dnia pozwala dodać robotę ze wstępną datą.
 
 ## Formularz roboty
-Nazwa (wymagana), data od/do (wymagane, końcowa >= początkowej, obie daty włącznie), opcjonalna godzina, uzgodniona kwota >= 0 i waluta, status, klient, telefon przez kartę klienta, adres, notatki i kolor zlecenia. Domyślny status: Zaplanowane. Przy konflikcie terminów wyświetl nazwy przecinających się robót oraz opcję zapisania mimo kolizji.
+Nazwa (wymagana), data od/do (wymagane, końcowa >= początkowej, obie daty włącznie), opcjonalna godzina, uzgodniona kwota >= 0 w euro (EUR), status, klient, telefon przez kartę klienta, adres, notatki i kolor zlecenia. Domyślny status: Zaplanowane. Przy konflikcie terminów wyświetl nazwy przecinających się robót oraz opcję zapisania mimo kolizji.
 Przyciski Zapisz/Anuluj; przy próbie wyjścia z niezapisanymi zmianami wyświetl potwierdzenie.
 
 ## Statusy i szczegóły
@@ -36,15 +36,15 @@ Imię/nazwa (wymagane), telefon, adres i notatki. Powiązane roboty i saldo nale
 Zakładki Nadchodzące/Wszystkie/Zakończone/Anulowane; filtry zakresu dat, statusu, klienta i niezapłaconych; wyszukiwanie w nazwie, adresie, kliencie oraz opisie. Sortuj datą i wartością. Stan pusty zawiera możliwość dodania zlecenia.
 
 ## Finanse
-Kwota umówiona każdej roboty liczona raz według daty rozpoczęcia. Zapłaty liczone według daty otrzymania. Saldo = umówiona kwota minus wpłaty. Zrobienie roboty nie oznacza zapłaty. Raport okresowy pokazuje wartość aktywnych zleceń, zakończonych robót, otrzymane pieniądze i zaległości. Nie dodawaj różnych walut; raporty w EUR. Nadpłaty oznacz osobno.
+Kwota umówiona każdej roboty liczona raz według daty rozpoczęcia. Zapłaty liczone według daty otrzymania. Saldo = umówiona kwota minus wpłaty. Zrobienie roboty nie oznacza zapłaty. Raport okresowy pokazuje wartość aktywnych zleceń, zakończonych robót, otrzymane pieniądze i zaległości. Wszystkie kwoty są w EUR i nie wymagają przeliczania kursów. Nadpłaty oznacz osobno.
 
 ## Ustawienia, dane, bezpieczeństwo
-Motyw systemowy/jasny/ciemny, domyślna waluta, eksport/import danych i kopie zapasowe. Kopia JSON ma numer wersji schematu i zawiera roboty, klientów, płatności oraz relacje. Import: podgląd, walidacja i zapis transakcyjny albo rollback. Preferowany import „zastąp obecną bazę” z wyraźnym potwierdzeniem. Wybór pliku przez Android Storage Access Framework. Żadnych niepotrzebnych uprawnień pamięci.
+Motyw systemowy/jasny/ciemny, stała waluta EUR, eksport/import danych i kopie zapasowe. Kopia JSON ma numer wersji schematu i zawiera roboty, klientów, płatności oraz relacje. Import: podgląd, walidacja i zapis transakcyjny albo rollback. Preferowany import „zastąp obecną bazę” z wyraźnym potwierdzeniem. Wybór pliku przez Android Storage Access Framework. Żadnych niepotrzebnych uprawnień pamięci.
 
 ## Zakres MVP i później
 MVP: trzy kalendarze, CRUD zleceń, klienci, finanse, zapłaty częściowe, wyszukiwanie, filtry, backup, testy. Po MVP: powiadomienia, drag-and-drop, zdjęcia, dni wolne. Odległa przyszłość: synchronizacja, faktury, konta i zespoły.
 
 ## Ustalenia techniczne
-Kotlin, Jetpack Compose, Material 3, Room, ViewModel, Flow, DataStore, Gradle Kotlin DSL. minSdk 26, compileSdk/targetSdk 36 na początek. Podczas implementacji sprawdź aktualne zgodne wersje AGP/Kotlin/KSP/Compose BOM. Android Developers: https://developer.android.com/jetpack/compose oraz https://developer.android.com/google/play/requirements/target-sdk .
+Docelowo: Kotlin, Jetpack Compose, Material 3, Room, ViewModel, Flow, DataStore. Pierwsza implementacja korzysta z SQLiteOpenHelper i StateFlow; minSdk 26, compileSdk 37, targetSdk 36. Podczas implementacji sprawdź aktualne zgodne wersje AGP/Kotlin/KSP/Compose BOM. Android Developers: https://developer.android.com/jetpack/compose oraz https://developer.android.com/google/play/requirements/target-sdk .
 
 Zobacz też [architekturę i dane](ARCHITEKTURA.md), [scenariusze](SCENARIUSZE.md), [plan realizacji](PLAN_REALIZACJI.md) i [testy](TESTY.md).
