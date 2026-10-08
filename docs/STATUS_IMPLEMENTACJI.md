@@ -1,0 +1,49 @@
+# Stan implementacji Android (2026-10-08)
+
+Ten plik oddziela **działający kod źródłowy / zaimplementowane ścieżki** od zaplanowanych funkcji i od **potwierdzonych testami** rezultatów. Samo dodanie kodu do repozytorium nie potwierdza, że APK zostało zbudowane.
+
+## Zaimplementowane w kodzie
+
+- Projekt Android Kotlin/Compose Material 3, minimalny SDK 26, target SDK 36, compile SDK 37.
+- Ekran główny to kalendarz: miesiąc/tydzień/dzień, widoczne zakresy wielodniowe i osobne tory dla przecinających się robót.
+- Dodaj/edytuj/duplikuj/status/anuluj/logicznie usuń robotę; waliduj zakres i potwierdzaj kolizje.
+- Waluta **EUR (€)**, zapisana jako `Long` w centach, format polski, bez niejawnego przewalutowania.
+- Lokalna baza SQLite (klienci, roboty, płatności), walidacje i zachowanie wpłat podczas edycji.
+- Dodawanie/edycja/archiwizowanie klientów, przypisywanie do zleceń.
+- Dodawanie i usuwanie wpłat, sumy i salda; zakończenie nie oznacza zapłacenia.
+- Raport wartości prac i faktycznych wpłat w wybranym miesiącu.
+- Eksport JSON i import z transakcją, walidacją formatu, relacji i wersji schematu. Import wymaga potwierdzenia zastąpienia danych.
+- Workflow GitHub Actions do kompilacji APK i uruchamiania testów jednostkowych.
+- Testy logiki EUR, dat granicznych i rozmieszczania pasków.
+
+## Czego jeszcze nie potwierdzono
+
+- [ ] Sukces kompilacji `assembleDebug` (brak lokalnego Android SDK/Gradle w środowisku wykonania tego zadania).
+- [ ] Zielony przebieg testów w GitHub Actions.
+- [ ] Instalacja APK i test manualny na fizycznym Androidzie.
+- [ ] Testy UI i import/eksport na dwóch instalacjach.
+- [ ] Wydajność z 1000 robót i 10 000 wpłat, TalkBack i czcionka 200%.
+- [ ] Przegląd działania przy obrocie ekranu i przerywaniu procesu.
+
+## Różnice względem pełnej specyfikacji (do dalszej pracy)
+
+- **Baza:** aktualnie `SQLiteOpenHelper`, a nie planowane `Room`. Wersja produkcyjna powinna mieć przetestowaną migrację bez utraty danych; nie zastępuj bazy po prostu destrukcyjną migracją.
+- **Kalendarz miesiąca:** limit widocznych 2 pasów i `+N więcej` (pełne zlecenia na liście wybranego dnia). Nie wdrożono przeciągania pasków.
+- **Kwoty:** tylko EUR (jest to zamierzona zmiana względem wczesnych planów z PLN).
+- **Klienci:** brak dedykowanego osobnego ekranu historii klienta i pełnych filtrów; podstawowe powiązania i podsumowanie są.
+- **Wpłaty:** dodawanie i usuwanie, bez osobnego formularza edycji istniejącej wpłaty.
+- **Backup:** import ma potwierdzenie, ale bez szczegółowego podglądu liczby rekordów przed zatwierdzeniem.
+- **Widoki:** wymagają dalszych testów responsywności; tryb ciemny, przypomnienia, zdjęcia, święta i synchronizacja nie są gotowe.
+- **Wersja release:** brak podpisanej produkcyjnej paczki AAB i polityki publikacji sklepowej.
+
+## Instrukcja weryfikacji
+
+1. Wejdź w [workflow Android](../.github/workflows/android.yml) i uruchom ręcznie `workflow_dispatch` albo sprawdź budowę po push.
+2. Gdy build jest zielony, pobierz artefakt `MojeRoboty-debug-apk`. Jeśli jest czerwony, sprawdź kroki Gradle i napraw wszystkie błędy kompilatora.
+3. Zainstaluj APK debug na Androidzie, dodaj robotę 12–14 października za 1200 EUR oraz drugą 13–16 października za 2600 EUR; zatwierdź kolizję.
+4. Sprawdź listę i kalendarz, klienta, zaliczkę 500 EUR, saldo 2100 EUR i eksport/import.
+5. Dopiero po zaliczeniu wszystkich kryteriów z [TESTY.md](TESTY.md) oznacz pierwszą wersję jako gotową.
+
+## Ważna zasada bezpieczeństwa danych
+
+Wewnątrz repozytorium nie wolno przechowywać danych prawdziwych klientów, kopii bazy, kluczy podpisu APK ani sekretów. Eksport JSON użytkownik zapisuje wyłącznie do świadomie wybranej lokalizacji.
