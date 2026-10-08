@@ -14,7 +14,7 @@ Powiązanie: [specyfikacja](SPECYFIKACJA.md), [plan](PLAN_REALIZACJI.md).
 - [ ] `endDate < startDate` odrzucane, tytuł whitespace odrzucany.
 - [ ] Wartości pieniężne: 0, 0.01, duże wartości, zaokrąglanie i przecinek polski.
 - [ ] 260000 groszy - 50000 - 210000 = 0; status DONE nie zmienia salda.
-- [ ] EUR nigdy są liczone poprawnie.
+- [ ] Kwoty w EUR są przechowywane jako całkowite centy, bez strat precyzji.
 - [ ] Kwota umówiona całego zlecenia zliczana tylko raz, wg daty startu.
 - [ ] Płatność przypisana do daty zapłaty, nie początku zlecenia.
 - [ ] CANCELLED wykluczone z aktywnej kwoty planu, zachowane w historii.
@@ -24,11 +24,11 @@ Powiązanie: [specyfikacja](SPECYFIKACJA.md), [plan](PLAN_REALIZACJI.md).
 ## Testy integracyjne
 - [ ] Create/edit/delete/undo i restart aplikacji.
 - [ ] Aktualizacja jednej roboty zmienia jednocześnie listę, kalendarz i finanse.
-- [ ] 1000 zleceń w Room, 10 000 płatności — bez ANR (pomiar na urządzeniu).
+- [ ] 1000 zleceń w lokalnej bazie SQLite, 10 000 płatności — bez ANR (pomiar na urządzeniu).
 - [ ] Eksport/import roundtrip: liczba i wszystkie pola, referencje, grosze, waluty, UUID.
 - [ ] Uszkodzony/importowany częściowo plik -> brak częściowego zapisu (rollback).
 - [ ] Nieobsługiwana przyszła schemaVersion -> czytelny błąd bez utraty obecnych danych.
-- [ ] Migracje schematu Room działają bez destrukcyjnego fallbacku.
+- [ ] Migracje schematu bazy działają bez destrukcyjnego fallbacku.
 - [ ] Offline / tryb samolotowy: pełne tworzenie i edycja.
 
 ## Testy UI / ręczne
