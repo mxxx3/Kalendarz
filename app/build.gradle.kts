@@ -1,5 +1,10 @@
 import java.util.Properties
 
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.plugin.compose")
+}
+
 val localFirebase = Properties().apply {
     val configuration = rootProject.file("local.properties")
     if (configuration.exists()) configuration.inputStream().use { load(it) }
@@ -8,10 +13,6 @@ fun firebaseSetting(name: String): String =
     (System.getenv(name) ?: localFirebase.getProperty(name) ?: "").trim()
 fun gradleString(value: String): String = "\""+value.replace("\\","\\\\").replace("\"","\\\"")+"\""
 
-plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.plugin.compose")
-}
 
 android {
     namespace = "pl.mojeroboty.app"
