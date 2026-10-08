@@ -2,7 +2,7 @@
 
 Natywna aplikacja w języku polskim do planowania robót remontowych, usług i prac wielodniowych. Jedno zlecenie obejmuje dowolny zakres dat i ma **jedną cenę za całość w EUR**, niezależnie od liczby dni.
 
-**Stan wersji 1.1:** Kod synchronizacji Firebase wymaga własnego projektu w Firebase i konfiguracji `FIREBASE_*` podczas budowania APK. Bez tych danych wersja działa tylko lokalnie. Szczegóły: [Wspólna ekipa i konfiguracja](docs/SYNCHRONIZACJA_FIREBASE.md).
+**Wersja 1.1 (projekt Firebase `kalendarz-8f0cb`):** Aplikacja Android jest skonfigurowana do łączenia z przesłanym projektem Firebase poprzez publiczny plik `firebase-project.properties`. Aby dwie osoby mogły faktycznie synchronizować dane, właściciel musi jeszcze **włączyć logowanie Email/Password, stworzyć bazę Cloud Firestore i opublikować [reguły uprawnień](firestore.rules)**. Sam zbudowany APK nie wykazuje, że serwer już działa. [Instrukcja](docs/SYNCHRONIZACJA_FIREBASE.md).
 
 **Stan na 8 października 2026:** APK debug został zbudowany, a testy jednostkowe zaliczone w [GitHub Actions](https://github.com/mxxx3/Kalendarz/actions/runs/37772445338). Test instalacji na fizycznym Androidzie i testy UI pozostają do wykonania. Szczegóły w [statusie implementacji](docs/STATUS_IMPLEMENTACJI.md).
 
@@ -24,12 +24,12 @@ Natywna aplikacja w języku polskim do planowania robót remontowych, usług i p
 1. Otwórz repozytorium jako projekt w aktualnym Android Studio z JDK 17.
 2. Zainstaluj Android SDK Platform **37** i Build Tools **36.0.0**.
 3. Gradle **9.4.1**, Android Gradle Plugin **9.2.0**, Compose BOM **2026.09.00**.
-   Aby uruchomić synchronizację, skonfiguruj projekt Firebase zgodnie z [instrukcją](docs/SYNCHRONIZACJA_FIREBASE.md).
+   Konfiguracja Androida projektu Firebase jest już dołączona jako `firebase-project.properties`. Dokończ konfigurację usług Firebase zgodnie z [instrukcją](docs/SYNCHRONIZACJA_FIREBASE.md).
 4. Ponieważ binarna paczka Gradle Wrapper nie znajduje się w repozytorium, użyj zainstalowanego Gradle albo wygeneruj wrapper poleceniem `gradle wrapper --gradle-version 9.4.1`.
 5. Uruchom `gradle :app:testDebugUnitTest :app:assembleDebug`.
 6. APK debug (gdy kompilacja się powiedzie): `app/build/outputs/apk/debug/app-debug.apk`.
 
-Potwierdzony sukces: [GitHub Actions 37772445338](https://github.com/mxxx3/Kalendarz/actions/runs/37772445338) → artefakt **MojeRoboty-debug-apk** zawierający `app-debug.apk`. Jest to wersja debug do samodzielnej instalacji, nie podpisane wydanie sklepowe. Przetestowany kod jest scalony z gałęzią `main`.
+Przykład wcześniejszego udanego buildu: [GitHub Actions 37772445338](https://github.com/mxxx3/Kalendarz/actions/runs/37772445338) → artefakt **MojeRoboty-debug-apk** zawierający `app-debug.apk`. Jest to wersja debug do samodzielnej instalacji, nie podpisane wydanie sklepowe. Przetestowany kod jest scalony z gałęzią `main`.
 
 ## Gdzie zacząć w kodzie
 
