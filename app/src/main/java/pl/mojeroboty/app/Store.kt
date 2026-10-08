@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -44,12 +45,26 @@ private class WorkDb(context: Context) : SQLiteOpenHelper(context, "moje_roboty.
 }
 
 class AppStore(context: Context) {
+    val cloud = CloudSync(context.applicationContext)
     private val helper = WorkDb(context.applicationContext)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val mutable = MutableStateFlow(Snapshot())
     val snapshot: StateFlow<Snapshot> = mutable
+    private var localSnapshot = Snapshot()
 
-    init { scope.launch { refresh() } }
+    init {
+        scope.launch { refresh() }
+        scope.launch {
+            cloud.status.collect { st ->
+                mutable.value = if (st.connected) cloud.snapshot.value else localSnapshot
+            }
+        }
+        scope.launch {
+            cloud.snapshot.collect { latest ->
+                if (cloud.status.value.connected) mutable.value = latest
+            }
+        }
+    }
 
     private fun Cursor.str(name: String) = getString(getColumnIndexOrThrow(name))
     private fun Cursor.num(name: String) = getLong(getColumnIndexOrThrow(name))
@@ -78,7 +93,11 @@ class AppStore(context: Context) {
         return Snapshot(jobs, clients, payments, true)
     }
 
-    suspend fun refresh() = withContext(Dispatchers.IO) { mutable.value = getSnapshot() }
+    suspend fun localCopy(): Snapshot = withContext(Dispatchers.IO) { getSnapshot() }
+    suspend fun refresh() = withContext(Dispatchers.IO) {
+        localSnapshot = getSnapshot()
+        if (!cloud.status.value.connected) mutable.value = localSnapshot
+    }
 
     private fun clientValues(c: Client) = ContentValues().apply {
         put("id", c.id); put("name", c.name); put("phone", c.phone)
@@ -97,6 +116,7 @@ class AppStore(context: Context) {
     }
 
     suspend fun saveJob(job: Job) = withContext(Dispatchers.IO) {
+        if (cloud.status.value.connected) { cloud.saveJob(job); return@withContext }
         require(job.title.isNotBlank() && !job.end.isBefore(job.start) && job.cents >= 0)
         val db = helper.writableDatabase
         val updated = db.update("jobs", jobValues(job), "id = ?", arrayOf(job.id))
@@ -105,6 +125,7 @@ class AppStore(context: Context) {
     }
 
     suspend fun saveClient(client: Client) = withContext(Dispatchers.IO) {
+        if (cloud.status.value.connected) { cloud.saveClient(client); return@withContext }
         require(client.name.isNotBlank())
         val db = helper.writableDatabase
         val updated = db.update("clients", clientValues(client), "id = ?", arrayOf(client.id))
@@ -113,23 +134,27 @@ class AppStore(context: Context) {
     }
 
     suspend fun addPayment(payment: Payment) = withContext(Dispatchers.IO) {
+        if (cloud.status.value.connected) { cloud.addPayment(payment); return@withContext }
         require(payment.cents > 0 && getSnapshot().jobs.any { it.id == payment.jobId })
         helper.writableDatabase.insertOrThrow("payments", null, paymentValues(payment))
         refresh()
     }
 
     suspend fun removeJob(id: String) = withContext(Dispatchers.IO) {
+        if (cloud.status.value.connected) { cloud.removeJob(id); return@withContext }
         helper.writableDatabase.execSQL("UPDATE jobs SET deleted = 1 WHERE id = ?", arrayOf(id))
         refresh()
     }
 
     suspend fun removePayment(id: String) = withContext(Dispatchers.IO) {
+        if (cloud.status.value.connected) { cloud.removePayment(id); return@withContext }
         helper.writableDatabase.delete("payments", "id = ?", arrayOf(id))
         refresh()
     }
 
     /** All records, including soft-deleted jobs, are included for a lossless export. */
     suspend fun exportJson(): String = withContext(Dispatchers.IO) {
+        require(!cloud.status.value.connected) { "Kopia JSON dostępna jest obecnie w trybie lokalnym." }
         val state = getSnapshot()
         val jobsAll = mutableListOf<Pair<Job, Boolean>>()
         helper.readableDatabase.rawQuery("SELECT * FROM jobs", null).use { c ->
@@ -157,6 +182,7 @@ class AppStore(context: Context) {
 
     /** Parse and verify entire document before touching the database; commit atomically. */
     suspend fun importJson(text: String) = withContext(Dispatchers.IO) {
+        require(!cloud.status.value.connected) { "Import JSON wykonaj w trybie lokalnym." }
         require(text.length <= 20_000_000) { "Plik kopii jest za duży." }
         val json = JSONObject(text)
         require(json.getInt("schemaVersion") == 1 && json.getString("currency") == "EUR") {

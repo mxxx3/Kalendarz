@@ -1,7 +1,18 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.plugin.compose")
 }
+
+val localFirebase = Properties().apply {
+    val configuration = rootProject.file("local.properties")
+    if (configuration.exists()) configuration.inputStream().use { load(it) }
+}
+fun firebaseSetting(name: String): String =
+    (System.getenv(name) ?: localFirebase.getProperty(name) ?: "").trim()
+fun gradleString(value: String): String = "\""+value.replace("\\","\\\\").replace("\"","\\\"")+"\""
+
 
 android {
     namespace = "pl.mojeroboty.app"
@@ -12,7 +23,10 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "1.1.0"
+        buildConfigField("String", "FIREBASE_API_KEY", gradleString(firebaseSetting("FIREBASE_API_KEY")))
+        buildConfigField("String", "FIREBASE_APP_ID", gradleString(firebaseSetting("FIREBASE_APP_ID")))
+        buildConfigField("String", "FIREBASE_PROJECT_ID", gradleString(firebaseSetting("FIREBASE_PROJECT_ID")))
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -43,6 +57,10 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+    implementation(platform("com.google.firebase:firebase-bom:35.0.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
     debugImplementation("androidx.compose.ui:ui-tooling")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")

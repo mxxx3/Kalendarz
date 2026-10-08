@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun WorkApp(store: AppStore) {
     val snapshot by store.snapshot.collectAsState()
+    val sharedStatus by store.cloud.status.collectAsState()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var tab by rememberSaveable { mutableStateOf("Kalendarz") }
@@ -100,7 +101,10 @@ private fun WorkApp(store: AppStore) {
                 verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text("Moje Roboty", fontSize = 25.sp, fontWeight = FontWeight.ExtraBold)
-                    Text("Twój kalendarz i zarobki w euro", fontSize = 12.sp, color = Color.Gray)
+                    Text(if (sharedStatus.connected) "Wspólna ekipa · " +
+                        (if (sharedStatus.fromCache) "offline" else "synchronizacja")
+                        else "Twój kalendarz i zarobki w euro",
+                        fontSize = 12.sp, color = Color.Gray)
                 }
                 IconButton(onClick = { tab = "Ustawienia" }) {
                     Icon(Icons.Default.Settings, "Ustawienia")
@@ -176,18 +180,24 @@ private fun WorkApp(store: AppStore) {
                     }
                 }
                 "Finanse" -> FinanceScreen(snapshot)
-                "Ustawienia" -> Column(Modifier.padding(20.dp),
+                "Ustawienia" -> Column(Modifier.fillMaxSize()
+                    .verticalScroll(rememberScrollState()).padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("Ustawienia", style = MaterialTheme.typography.headlineSmall)
-                    Text("Waluta: EUR (€). Aplikacja pracuje lokalnie bez internetu.")
-                    Button(onClick = {
+                    Text("Waluta: EUR (€) · Wersja 1.1")
+                    CollaborationScreen(store)
+                    HorizontalDivider()
+                    Text("Kopia zapasowa danych lokalnych",
+                        fontWeight = FontWeight.Bold)
+                    Text("Eksport/import JSON dostępny w trybie osobistym. " +
+                        "Dane wspólnej ekipy są w Firestore; nie eksportuj ich jako kopii lokalnej.",
+                        style = MaterialTheme.typography.bodySmall)
+                    Button(enabled = !sharedStatus.connected, onClick = {
                         exportLauncher.launch("moje-roboty-" + LocalDate.now() + ".json")
-                    }, modifier = Modifier.fillMaxWidth()) { Text("Eksportuj kopię danych") }
-                    OutlinedButton(onClick = { importLauncher.launch("application/json") },
-                        modifier = Modifier.fillMaxWidth()) { Text("Importuj kopię danych") }
-                    Text("Import zastępuje dotychczasowe dane. Najpierw zrób eksport.",
-                        color = Color.Gray)
-                    Text("Wersja 1.0", color = Color.Gray)
+                    }, modifier = Modifier.fillMaxWidth()) { Text("Eksportuj lokalną kopię JSON") }
+                    OutlinedButton(enabled = !sharedStatus.connected,
+                        onClick = { importLauncher.launch("application/json") },
+                        modifier = Modifier.fillMaxWidth()) { Text("Importuj lokalną kopię JSON") }
                 }
             }
         }

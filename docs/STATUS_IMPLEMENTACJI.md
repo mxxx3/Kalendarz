@@ -1,3 +1,5 @@
+> **Aktualizacja 1.1:** Dodano opcjonalny kod współdzielonej ekipy (Firebase Auth, Firestore, członkostwo UID, zapisy i odczyt realtime, import lokalnych danych do nowej ekipy). Działa wyłącznie po zewnętrznej konfiguracji Firebase i publikacji [reguł](../firestore.rules). CI potwierdza jedynie kompilację/testy jednostkowe; **nie przeprowadzono jeszcze testu synchronizacji między dwoma prawdziwymi kontami w skonfigurowanym Firebase**. Konfiguracja i wymagane testy: [SYNCHRONIZACJA_FIREBASE.md](SYNCHRONIZACJA_FIREBASE.md).
+
 # Stan implementacji Android (2026-10-08)
 
 Ten plik oddziela **działający kod źródłowy / zaimplementowane ścieżki** od zaplanowanych funkcji i od **potwierdzonych testami** rezultatów. Samo dodanie kodu do repozytorium nie potwierdza, że APK zostało zbudowane.
@@ -35,6 +37,7 @@ Ten plik oddziela **działający kod źródłowy / zaimplementowane ścieżki** 
 - **Backup:** import ma potwierdzenie, ale bez szczegółowego podglądu liczby rekordów przed zatwierdzeniem.
 - **Widoki:** wymagają dalszych testów responsywności; tryb ciemny, przypomnienia, zdjęcia, święta i synchronizacja nie są gotowe.
 - **Wersja release:** brak podpisanej produkcyjnej paczki AAB i polityki publikacji sklepowej.
+- **Wersja 1.1:** synchronizacja ma szkielet i UI oraz weryfikację kompilacji w CI, ale nie działa bez backendu i kont; brak testów E2E Cloud Firestore, rozwiązywania konfliktów edycji, audytu zmian i chmurowego eksportu/backup.
 
 ## Instrukcja weryfikacji
 
