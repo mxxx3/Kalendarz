@@ -16,10 +16,10 @@ Ten plik oddziela **działający kod źródłowy / zaimplementowane ścieżki** 
 - Workflow GitHub Actions do kompilacji APK i uruchamiania testów jednostkowych.
 - Testy logiki EUR, dat granicznych i rozmieszczania pasków.
 
-## Czego jeszcze nie potwierdzono
+## Status weryfikacji
 
-- [ ] Sukces kompilacji `assembleDebug` (brak lokalnego Android SDK/Gradle w środowisku wykonania tego zadania).
-- [ ] Zielony przebieg testów w GitHub Actions.
+- [x] Sukces `assembleDebug` w GitHub Actions, 8.10.2026 (run 37772445338).
+- [x] Zielony przebieg testów jednostkowych w GitHub Actions.
 - [ ] Instalacja APK i test manualny na fizycznym Androidzie.
 - [ ] Testy UI i import/eksport na dwóch instalacjach.
 - [ ] Wydajność z 1000 robót i 10 000 wpłat, TalkBack i czcionka 200%.
@@ -38,8 +38,8 @@ Ten plik oddziela **działający kod źródłowy / zaimplementowane ścieżki** 
 
 ## Instrukcja weryfikacji
 
-1. Wejdź w [workflow Android](../.github/workflows/android.yml) i uruchom ręcznie `workflow_dispatch` albo sprawdź budowę po push.
-2. Gdy build jest zielony, pobierz artefakt `MojeRoboty-debug-apk`. Jeśli jest czerwony, sprawdź kroki Gradle i napraw wszystkie błędy kompilatora.
+1. [Potwierdzony udany build i testy jednostkowe](https://github.com/mxxx3/Kalendarz/actions/runs/37772445338); artefakt `MojeRoboty-debug-apk` zawiera `app-debug.apk`.
+2. Pobierz `MojeRoboty-debug-apk` z udanego przebiegu GitHub Actions lub uruchom ponownie workflow dla bieżącej gałęzi.
 3. Zainstaluj APK debug na Androidzie, dodaj robotę 12–14 października za 1200 EUR oraz drugą 13–16 października za 2600 EUR; zatwierdź kolizję.
 4. Sprawdź listę i kalendarz, klienta, zaliczkę 500 EUR, saldo 2100 EUR i eksport/import.
 5. Dopiero po zaliczeniu wszystkich kryteriów z [TESTY.md](TESTY.md) oznacz pierwszą wersję jako gotową.
