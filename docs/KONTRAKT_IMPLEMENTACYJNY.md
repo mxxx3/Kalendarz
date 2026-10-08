@@ -10,13 +10,13 @@ Ten dokument doprecyzowuje [specyfikację](SPECYFIKACJA.md), [UX/UI](UX_UI.md), 
 4. Cena podawana w formularzu to cena całej roboty; nie mnożyć jej przez dni.
 5. Nakładanie terminów jest dozwolone po wyświetleniu ostrzeżenia z nazwami kolidujących robót.
 6. „Zrobione” nie znaczy „zapłacone”. Każda wpłata jest osobnym wpisem.
-7. Nie wolno mieszać kwot EUR w jednej sumie.
+7. Wszystkie kwoty zapisuj w euro (EUR) i obliczaj w centach.
 
 ## 2. Minimalny, szybki przebieg
 Po kliknięciu **+ Dodaj robotę**:
 - fokus na nazwie („Remont łazienki”);
 - data od i do ustawione na wybrany dzień;
-- pole „Kwota za całą robotę” i waluta (domyślnie EUR; EUR opcjonalnie);
+- pole „Kwota za całą robotę” i waluta (EUR, bez wyboru innej waluty);
 - przycisk **Zapisz** zawsze dostępny po spełnieniu walidacji;
 - klient, adres, godzina, notatka, kolor i status pod „Więcej szczegółów”.
 
@@ -35,11 +35,11 @@ Po kliknięciu **+ Dodaj robotę**:
 - `Job(id UUID, title, startDate LocalDate, endDate LocalDate, startTime?, clientId?, address?, notes?, agreedAmountMinor Long, currency, status, labelColor, createdAt, updatedAt, deletedAt?)`.
 - `Client(id UUID, name, phone?, address?, notes?, archived, createdAt, updatedAt)`.
 - `Payment(id UUID, jobId, amountMinor Long, currency, paidAt LocalDate, method?, notes?, createdAt)`.
-- Trwała baza: Room. Preferencje: DataStore. UI: Kotlin, Jetpack Compose i Material 3.
-- Kwoty zapisywać jako całkowitą liczbę jednostek minor (np. 2600,00 EUR = 260000 groszy), **nigdy Float/Double**. Parsować polski przecinek bez błędów precyzji.
+- Trwała baza w obecnym kodzie: SQLiteOpenHelper; docelowo może zostać przeniesiona do Room z bezstratną migracją. Preferencje ekranów: rememberSaveable; UI: Kotlin, Jetpack Compose i Material 3.
+- Kwoty zapisywać jako całkowitą liczbę jednostek minor (np. 2600,00 EUR = 260000 centów), **nigdy Float/Double**. Parsować polski przecinek bez błędów precyzji.
 - `paid = sum(payments for job)`; `remaining = agreed - paid`; ujemna kwota pozostała to **nadpłata**, oznaczona jednoznacznie.
 - Dla przedziału widocznego `[a,b]`: `startDate <= b && endDate >= a` oraz brak usunięcia. Przy edycji konfliktów pomijaj własny identyfikator.
-- Polityka płatności: dodatnia kwota, waluta identyczna jak zlecenia; wpłaty większe od kwoty mogą powodować nadpłatę, ale należy pokazać ostrzeżenie. Edycja waluty roboty z istniejącymi wpłatami wymaga blokady i osobnego jawnego rozwiązania (np. usunięcie lub korekta wpłat), **bez automatycznego przewalutowania**.
+- Polityka płatności: dodatnia kwota, waluta identyczna jak zlecenia; wpłaty większe od kwoty mogą powodować nadpłatę, ale należy pokazać ostrzeżenie. Waluta nie podlega zmianie: wszystkie roboty i płatności są w EUR.
 - Archiwizacja klienta nie rozłącza jego historii. Usuwanie pracy z wpłatami musi zachować spójność: wybierz logiczne usunięcie (deletedAt), ukryj je ze zwykłych list i raportów, a eksport świadomie zachowa dane wraz z płatnościami; możliwość przywrócenia przed trwałym usunięciem.
 - W raportach rozdziel: *wartość umów aktywnych według daty rozpoczęcia*, *wpłaty według faktycznej daty otrzymania*, *bieżące należności ze wszystkich nieusuniętych nieanulowanych robót*. Nie opisuj sumy wartości umów jako gotówki otrzymanej.
 
@@ -65,8 +65,8 @@ Eksport/import przez Android Storage Access Framework. Eksport JSON zawiera `sch
 - Przypadkowe dotknięcia/gesty nie mogą zmieniać terminu. Drag-and-drop dopiero po MVP.
 
 ## 8. Kolejność pracy dla agenta/kodera
-1. Sprawdź oficjalną, aktualną dokumentację Android (wersje AGP/Kotlin/Compose/Room/KSP), skonfiguruj projekt, CI i uruchom debug na emulatorze.
-2. Utwórz encje, Room DAO, migracje, konwertery dat, repozytoria i testy domenowe.
+1. Sprawdź oficjalną, aktualną dokumentację Android (wersje AGP/Kotlin/Compose), skonfiguruj projekt, CI i uruchom debug na emulatorze.
+2. Utwórz modele, lokalne tabele SQLite, bezpieczny sposób aktualizacji schematu, obsługę dat i testy domenowe.
 3. Zrób formularz tworzenia/edycji i szczegóły — zapis ma być trwały offline.
 4. Zaimplementuj najpierw *czysty*, testowalny algorytm segmentacji kalendarza, a potem miesiąc, tydzień i dzień w Compose.
 5. Dodaj klientów, wpłaty, raporty, filtry i wyszukiwarkę.
@@ -83,11 +83,11 @@ Każdy etap ma zawierać kod źródłowy, testy, aktualizację dokumentacji i wy
 - [ ] Zamknięto i wznowiono aplikację offline, dane się zachowały.
 - [ ] Zaznaczono „Zrobione”, a zaległość pozostała bez zmian.
 - [ ] Dodano zaliczkę i dopłatę, saldo jest poprawne.
-- [ ] W raporcie EUR nie są dodawane do siebie.
+- [ ] Raport rozlicza poprawnie wszystkie kwoty w euro.
 - [ ] Widok dnia i wyszukiwarka znajdują robotę zaczętą w poprzednim miesiącu.
 - [ ] Kalendarz jest dostępny na małym ekranie i przy większej czcionce.
 - [ ] Import poprawnej kopii odtwarza całość; uszkodzony import nie usuwa danych.
-- [ ] Testy jednostkowe, Room, UI i smoke-test APK są zaliczone.
+- [ ] Testy jednostkowe, SQLite, UI i smoke-test APK są zaliczone.
 
 ## 10. Granice MVP
 **MVP:** lokalny kalendarz miesiąca/tygodnia/dnia, roboty wielodniowe, klienci, płatności częściowe, raporty, wyszukiwanie, backup, używalny UI, testy.
