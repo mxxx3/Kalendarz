@@ -58,8 +58,7 @@ fun CollaborationScreen(store: AppStore) {
             }
         }
     }
-    Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())
-        .padding(top = 10.dp, bottom = 20.dp),
+    Column(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text("Wspólna ekipa — synchronizacja", fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium)
