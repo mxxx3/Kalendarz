@@ -10,13 +10,13 @@ Ten dokument doprecyzowuje [specyfikację](SPECYFIKACJA.md), [UX/UI](UX_UI.md), 
 4. Cena podawana w formularzu to cena całej roboty; nie mnożyć jej przez dni.
 5. Nakładanie terminów jest dozwolone po wyświetleniu ostrzeżenia z nazwami kolidujących robót.
 6. „Zrobione” nie znaczy „zapłacone”. Każda wpłata jest osobnym wpisem.
-7. Nie wolno mieszać kwot PLN i EUR w jednej sumie.
+7. Nie wolno mieszać kwot EUR w jednej sumie.
 
 ## 2. Minimalny, szybki przebieg
 Po kliknięciu **+ Dodaj robotę**:
 - fokus na nazwie („Remont łazienki”);
 - data od i do ustawione na wybrany dzień;
-- pole „Kwota za całą robotę” i waluta (domyślnie PLN; EUR opcjonalnie);
+- pole „Kwota za całą robotę” i waluta (domyślnie EUR; EUR opcjonalnie);
 - przycisk **Zapisz** zawsze dostępny po spełnieniu walidacji;
 - klient, adres, godzina, notatka, kolor i status pod „Więcej szczegółów”.
 
@@ -36,7 +36,7 @@ Po kliknięciu **+ Dodaj robotę**:
 - `Client(id UUID, name, phone?, address?, notes?, archived, createdAt, updatedAt)`.
 - `Payment(id UUID, jobId, amountMinor Long, currency, paidAt LocalDate, method?, notes?, createdAt)`.
 - Trwała baza: Room. Preferencje: DataStore. UI: Kotlin, Jetpack Compose i Material 3.
-- Kwoty zapisywać jako całkowitą liczbę jednostek minor (np. 2600,00 PLN = 260000 groszy), **nigdy Float/Double**. Parsować polski przecinek bez błędów precyzji.
+- Kwoty zapisywać jako całkowitą liczbę jednostek minor (np. 2600,00 EUR = 260000 groszy), **nigdy Float/Double**. Parsować polski przecinek bez błędów precyzji.
 - `paid = sum(payments for job)`; `remaining = agreed - paid`; ujemna kwota pozostała to **nadpłata**, oznaczona jednoznacznie.
 - Dla przedziału widocznego `[a,b]`: `startDate <= b && endDate >= a` oraz brak usunięcia. Przy edycji konfliktów pomijaj własny identyfikator.
 - Polityka płatności: dodatnia kwota, waluta identyczna jak zlecenia; wpłaty większe od kwoty mogą powodować nadpłatę, ale należy pokazać ostrzeżenie. Edycja waluty roboty z istniejącymi wpłatami wymaga blokady i osobnego jawnego rozwiązania (np. usunięcie lub korekta wpłat), **bez automatycznego przewalutowania**.
@@ -83,7 +83,7 @@ Każdy etap ma zawierać kod źródłowy, testy, aktualizację dokumentacji i wy
 - [ ] Zamknięto i wznowiono aplikację offline, dane się zachowały.
 - [ ] Zaznaczono „Zrobione”, a zaległość pozostała bez zmian.
 - [ ] Dodano zaliczkę i dopłatę, saldo jest poprawne.
-- [ ] W raporcie PLN i EUR nie są dodawane do siebie.
+- [ ] W raporcie EUR nie są dodawane do siebie.
 - [ ] Widok dnia i wyszukiwarka znajdują robotę zaczętą w poprzednim miesiącu.
 - [ ] Kalendarz jest dostępny na małym ekranie i przy większej czcionce.
 - [ ] Import poprawnej kopii odtwarza całość; uszkodzony import nie usuwa danych.
