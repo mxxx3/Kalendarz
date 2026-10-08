@@ -98,15 +98,17 @@ class AppStore(context: Context) {
 
     suspend fun saveJob(job: Job) = withContext(Dispatchers.IO) {
         require(job.title.isNotBlank() && !job.end.isBefore(job.start) && job.cents >= 0)
-        helper.writableDatabase.insertWithOnConflict("jobs", null, jobValues(job), SQLiteDatabase.CONFLICT_REPLACE)
-            .also { check(it != -1L) }
+        val db = helper.writableDatabase
+        val updated = db.update("jobs", jobValues(job), "id = ?", arrayOf(job.id))
+        if (updated == 0) db.insertOrThrow("jobs", null, jobValues(job))
         refresh()
     }
 
     suspend fun saveClient(client: Client) = withContext(Dispatchers.IO) {
         require(client.name.isNotBlank())
-        helper.writableDatabase.insertWithOnConflict("clients", null, clientValues(client), SQLiteDatabase.CONFLICT_REPLACE)
-            .also { check(it != -1L) }
+        val db = helper.writableDatabase
+        val updated = db.update("clients", clientValues(client), "id = ?", arrayOf(client.id))
+        if (updated == 0) db.insertOrThrow("clients", null, clientValues(client))
         refresh()
     }
 
