@@ -38,6 +38,7 @@ fun CollaborationScreen(store: AppStore) {
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf("") }
     var confirmation by remember { mutableStateOf(false) }
+    var revokeUid by remember { mutableStateOf<String?>(null) }
 
     fun copy(value: String) {
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -143,6 +144,14 @@ fun CollaborationScreen(store: AppStore) {
                         Icon(Icons.Default.Group, null); Spacer(Modifier.width(6.dp))
                         Text("Nadaj dostęp")
                     }
+                    Text("Osoby w ekipie", fontWeight = FontWeight.Bold)
+                    status.memberUids.filter { it != status.userId }.forEach { member ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(member.take(16) + "…", Modifier.weight(1f),
+                                style = MaterialTheme.typography.bodySmall)
+                            TextButton(onClick = { revokeUid = member }) { Text("Odbierz dostęp") }
+                        }
+                    }
                     HorizontalDivider()
                     Text("Przenieś dotychczasowe roboty z telefonu do ekipy",
                         fontWeight = FontWeight.Bold)
@@ -185,6 +194,18 @@ fun CollaborationScreen(store: AppStore) {
         Text("Zmiany podczas braku internetu są buforowane przez Firestore. " +
             "Przy jednoczesnej edycji tej samej roboty ostatnia zapisana wersja wygrywa.",
             style = MaterialTheme.typography.bodySmall)
+    }
+    if (revokeUid != null) {
+        AlertDialog(onDismissRequest = { revokeUid = null },
+            title = { Text("Odebrać dostęp?") },
+            text = { Text("Współpracownik straci dostęp do wspólnego kalendarza. " +
+                "Jego lokalny cache może jednak pozostać na urządzeniu.") },
+            confirmButton = { Button(onClick = {
+                val who = revokeUid ?: return@Button
+                revokeUid = null
+                perform { cloud.removeMember(who) }
+            }) { Text("Odbierz dostęp") } },
+            dismissButton = { TextButton(onClick = { revokeUid = null }) { Text("Anuluj") } })
     }
     if (confirmation) {
         AlertDialog(onDismissRequest = { confirmation = false },
