@@ -40,7 +40,7 @@ Dokument bazowy: [SPECYFIKACJA](SPECYFIKACJA.md). Implementować iteracyjnie: ka
 ## Faza 4 — finanse, listy, klienci
 - [ ] Płatności częściowe, edycja i usuwanie wpłat.
 - [ ] Raporty miesiąc/zakres z semantyką daty startu i daty płatności.
-- [ ] Multi-currency bez mieszania PLN/EUR.
+- [ ] Rozliczenia wyłącznie w EUR.
 - [ ] Wyszukiwanie, filtrowanie, sortowanie robót; archiwizacja klientów.
 **DoD:** S05–S08, S12, S15–S17.
 
