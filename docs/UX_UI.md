@@ -51,10 +51,10 @@ Nagłówek: dzień tygodnia + pełna data. Karty na liście: nazwa, klient, loka
 6. Sekcja „Więcej szczegółów” rozwija pola: klient/nowy klient, adres, notatka, godzina, waluta, status, kolor.
 7. Jeśli wybrano okres z innymi robotami, wyświetl nienachalny komunikat „Nakłada się z: …” i akcję „Zapisz mimo to”.
 
-**Walidacje:** niepusta nazwa po trim, data końca >= początku, poprawna kwota >= 0, kontrola przepełnienia Long i precyzji waluty. Pusta kwota musi mieć jawnie ustaloną semantykę: w MVP pole wymagane, ale 0 oznacza jeszcze niewycenione; UI oznacza „Wycena do ustalenia”, a w raporcie nie przedstawia jej jako pewnego przychodu. Wybór waluty z kodów ISO 4217; dla PLN/EUR dwie cyfry groszy/centów. Przypadkowy Back przy zmianach = dialog „Odrzucić zmiany?”.
+**Walidacje:** niepusta nazwa po trim, data końca >= początku, poprawna kwota >= 0, kontrola przepełnienia Long i precyzji waluty. Pusta kwota musi mieć jawnie ustaloną semantykę: w MVP pole wymagane, ale 0 oznacza jeszcze niewycenione; UI oznacza „Wycena do ustalenia”, a w raporcie nie przedstawia jej jako pewnego przychodu. Wybór waluty z kodów ISO 4217; dla EUR dwie cyfry groszy/centów. Przypadkowy Back przy zmianach = dialog „Odrzucić zmiany?”.
 
 ## 5. Szczegóły zlecenia
-Widok „Remont łazienki”: 13–16 października (4 dni kalendarzowe), status „W trakcie”, klient i telefon, adres, notatka, kwota umówiona 2600 PLN, wpłacono 500 PLN, pozostało 2100 PLN. Przyciski: **Edytuj**, **Dodaj wpłatę**, **Zmień status**. Menu dodatkowe: duplikuj z wyborem nowych dat, anuluj, usuń z potwierdzeniem. „Zrobione” **nie zmienia** salda na zero. Kwota ujemnego salda = nadpłata i wymaga czytelnego oznaczenia.
+Widok „Remont łazienki”: 13–16 października (4 dni kalendarzowe), status „W trakcie”, klient i telefon, adres, notatka, kwota umówiona 2600 EUR, wpłacono 500 EUR, pozostało 2100 EUR. Przyciski: **Edytuj**, **Dodaj wpłatę**, **Zmień status**. Menu dodatkowe: duplikuj z wyborem nowych dat, anuluj, usuń z potwierdzeniem. „Zrobione” **nie zmienia** salda na zero. Kwota ujemnego salda = nadpłata i wymaga czytelnego oznaczenia.
 
 ## 6. Przepływy użytkownika
 - **Szybkie dodanie:** dziś -> + -> tytuł -> od/do -> kwota -> zapisz -> pasek natychmiast widoczny.
@@ -70,7 +70,7 @@ Widok „Remont łazienki”: 13–16 października (4 dni kalendarzowe), status
 - Praca jednodniowa; zero robót; 15 robót jednego dnia; 1000 zapisanych robót.
 - Zmiana orientacji, zamknięcie procesu podczas formularza, duża czcionka 200%, ekran szerokości 360dp.
 - Mało miejsca: bez poziomego obcinania całego kalendarza; skróty nazw, lista dnia i dostępność zamiast mikroskopijnego tekstu.
-- Brak internetu, odmowa uprawnień, duża liczba wpłat, uszkodzony import, waluty PLN/EUR.
+- Brak internetu, odmowa uprawnień, duża liczba wpłat, uszkodzony import, waluty EUR.
 - Anulowanie nie usuwa historii; archiwizacja klienta nie usuwa jego robót.
 - Walidacja zakresów przed zapisem, a nadmierna liczba dni nie może zawieszać UI.
 
