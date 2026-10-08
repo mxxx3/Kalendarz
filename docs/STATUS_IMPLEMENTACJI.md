@@ -20,8 +20,9 @@ Ten plik oddziela **działający kod źródłowy / zaimplementowane ścieżki** 
 
 ## Status weryfikacji
 
-- [x] Sukces `assembleDebug` w GitHub Actions, 8.10.2026 (run 37772445338).
-- [x] Zielony przebieg testów jednostkowych w GitHub Actions.
+- [x] Sukces `assembleDebug` w GitHub Actions dla wersji współdzielonej 1.1, 8.10.2026 (run 37776897979).
+- [x] Zielony przebieg testów jednostkowych w GitHub Actions dla 1.1.
+- [ ] Testy dwóch kont na rzeczywistym projekcie Firebase + weryfikacja reguł Firestore w emulatorze.
 - [ ] Instalacja APK i test manualny na fizycznym Androidzie.
 - [ ] Testy UI i import/eksport na dwóch instalacjach.
 - [ ] Wydajność z 1000 robót i 10 000 wpłat, TalkBack i czcionka 200%.
@@ -50,3 +51,7 @@ Ten plik oddziela **działający kod źródłowy / zaimplementowane ścieżki** 
 ## Ważna zasada bezpieczeństwa danych
 
 Wewnątrz repozytorium nie wolno przechowywać danych prawdziwych klientów, kopii bazy, kluczy podpisu APK ani sekretów. Eksport JSON użytkownik zapisuje wyłącznie do świadomie wybranej lokalizacji.
+
+## Uwaga przy aktualizowaniu wersji testowej
+
+GitHub Actions tworzy domyślny **debug APK** z kluczem podpisu generowanym na runnerze. Kolejne buildy mogą mieć inny certyfikat niż już zainstalowany APK. Android może wtedy odmówić instalacji aktualizacji bez odinstalowania starszej wersji. **Odinstalowanie kasuje lokalną bazę SQLite.** Przed zmianą wydania wykonaj w starej aplikacji Ustawienia → Eksport kopii JSON i zapisz plik poza telefonem, a po instalacji nowej aplikacji zaimportuj kopię. Docelowa dystrybucja wymaga jednego stałego, bezpiecznie przechowywanego klucza podpisu (poza repozytorium). Nie zalecaj odinstalowania bez kopii.
