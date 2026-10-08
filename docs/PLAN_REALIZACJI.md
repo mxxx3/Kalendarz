@@ -4,7 +4,7 @@ Dokument bazowy: [SPECYFIKACJA](SPECYFIKACJA.md). Implementować iteracyjnie: ka
 ## Faza 0 — projekt i fundament
 - [ ] Utwórz projekt Android Kotlin, Gradle Kotlin DSL, wersje zależności przez version catalog.
 - [ ] Ustal namespace np. `pl.mojeroboty.app` (przed publikacją zweryfikuj unikalność), minSdk 26, compile/target SDK 36.
-- [ ] Konfiguruj Jetpack Compose + Material 3, Navigation Compose, ViewModel, Lifecycle, Kotlin coroutines/Flow, Hilt (lub prosty DI), Room, DataStore.
+- [ ] Konfiguruj Jetpack Compose + Material 3, Navigation Compose, ViewModel, Lifecycle, Kotlin coroutines/Flow, Hilt (lub prosty DI), Room (wersja docelowa) lub SQLiteOpenHelper (aktualny fundament), DataStore.
 - [ ] Sprawdź zgodność wersji Gradle/AGP/Kotlin/KSP na oficjalnych stronach; nie zamrażaj tu arbitralnych numerów.
 - [ ] Ustaw formatowanie, lint, statyczną analizę, unit/instrumented tests, GitHub Actions z testami na PR.
 - [ ] Zaprojektuj paletę, typografię, light/dark, dostępność, ekrany puste/błędów/loading.
