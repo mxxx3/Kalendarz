@@ -179,7 +179,7 @@ private fun WorkApp(store: AppStore) {
                         }
                     }
                 }
-                "Finanse" -> FinanceScreen(snapshot)
+                "Finanse" -> FinanceScreen(snapshot, onJob = { details = it.id })
                 "Ustawienia" -> Column(Modifier.fillMaxSize()
                     .verticalScroll(rememberScrollState()).padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -464,35 +464,90 @@ fun JobCard(job: Job,state: Snapshot, onClick: () -> Unit) {
 }
 
 @Composable
-private fun FinanceScreen(state: Snapshot) {
+private fun FinanceScreen(state: Snapshot, onJob: (Job) -> Unit) {
     var monthText by rememberSaveable { mutableStateOf(LocalDate.now().toString().take(7)) }
-    val month=LocalDate.parse(monthText+"-01")
-    val start=month.withDayOfMonth(1)
-    val end=month.withDayOfMonth(month.lengthOfMonth())
-    val active=state.jobs.filter { it.status!="CANCELLED" }
-    Column(Modifier.verticalScroll(rememberScrollState()).padding(14.dp),
-        verticalArrangement=Arrangement.spacedBy(12.dp)) {
-        Row(verticalAlignment=Alignment.CenterVertically) {
-            IconButton(onClick={monthText=month.minusMonths(1).toString().take(7)}){
-                Icon(Icons.Default.ChevronLeft,"Poprzedni miesiąc")
+    var filter by rememberSaveable { mutableStateOf("Wszystkie") }
+    val month = LocalDate.parse(monthText + "-01")
+    val start = month.withDayOfMonth(1)
+    val end = month.withDayOfMonth(month.lengthOfMonth())
+    val active = state.jobs.filter { it.status != "CANCELLED" }
+    val completedThisMonth = completedValue(active, start, end)
+    val allCompleted = completedTotal(active)
+    val completedDue = completedOutstanding(state)
+    val allDue = active.sumOf { state.remaining(it).coerceAtLeast(0) }
+    val unpaid = active.filter { state.remaining(it) > 0 }
+        .sortedWith(compareBy<Job> { it.start }.thenBy { it.title })
+    val filtered = when (filter) {
+        "Zrobione" -> unpaid.filter { it.status == "DONE" }
+        "Pozostałe" -> unpaid.filter { it.status != "DONE" }
+        else -> unpaid
+    }
+
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { monthText = month.minusMonths(1).toString().take(7) }) {
+                Icon(Icons.Default.ChevronLeft, "Poprzedni miesiąc")
             }
             Text(month.format(DateTimeFormatter.ofPattern("LLLL yyyy",
-                Locale.forLanguageTag("pl-PL"))),modifier=Modifier.weight(1f),
-                fontWeight=FontWeight.Bold)
-            IconButton(onClick={monthText=month.plusMonths(1).toString().take(7)}){
-                Icon(Icons.Default.ChevronRight,"Następny miesiąc")
+                Locale.forLanguageTag("pl-PL"))),
+                modifier = Modifier.weight(1f),
+                fontWeight = FontWeight.Bold)
+            IconButton(onClick = { monthText = month.plusMonths(1).toString().take(7) }) {
+                Icon(Icons.Default.ChevronRight, "Następny miesiąc")
             }
         }
-        FinanceTile("Wartość robót rozpoczętych", money(plannedValue(active,start,end)))
-        FinanceTile("Wpłaty otrzymane w miesiącu", money(received(state.payments,start,end)))
-        FinanceTile("Aktualne należności (wszystkie terminy)",
-            money(active.sumOf { state.remaining(it).coerceAtLeast(0) }))
-        Text("Kwota umowy liczy się raz w dniu rozpoczęcia. " +
-            "Wpłaty według daty otrzymania. Zrobione ≠ zapłacone.", color=Color.Gray)
-        Text("Niezapłacone roboty",fontWeight=FontWeight.Bold)
-        active.filter { state.remaining(it)>0 }.forEach {
-            Text(it.title+" — "+money(state.remaining(it)))
+
+        FinanceTile("Wartość robót rozpoczętych w miesiącu",
+            money(plannedValue(active, start, end)))
+        FinanceTile("Zrobione w miesiącu (według daty końca)", money(completedThisMonth))
+        FinanceTile("Wartość wszystkich robót oznaczonych „Zrobione”", money(allCompleted))
+        FinanceTile("Faktycznie otrzymane wpłaty w miesiącu",
+            money(received(state.payments, start, end)))
+        FinanceTile("Do otrzymania za wykonane roboty", money(completedDue))
+        FinanceTile("Łącznie do otrzymania za wszystkie roboty", money(allDue))
+
+        Text("„Zrobione” oznacza wykonanie pracy, a nie otrzymanie zapłaty. " +
+            "Bez zapisanej wpłaty w zakładce roboty suma otrzymanych pieniędzy wynosi 0 €. " +
+            "Aplikacja nie zapisuje jeszcze faktycznej daty ukończenia, więc podsumowanie " +
+            "miesięczne ukończonych prac wykorzystuje datę końca zlecenia.",
+            color = Color.Gray, style = MaterialTheme.typography.bodySmall)
+
+        HorizontalDivider()
+        Text("Roboty z zaległymi płatnościami", fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleMedium)
+        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf("Wszystkie", "Zrobione", "Pozostałe").forEach { value ->
+                FilterChip(selected = filter == value, onClick = { filter = value },
+                    label = { Text(value) })
+            }
         }
+        Text("Lista pokazuje wszystkie terminy. Kliknij robotę, aby zobaczyć " +
+            "szczegóły lub dodać wpłatę.", style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray)
+        if (filtered.isEmpty()) {
+            Text("Brak robót z nieopłaconym saldem w tej kategorii.",
+                color = Color.Gray, modifier = Modifier.padding(vertical = 10.dp))
+        } else {
+            filtered.forEach { job ->
+                ElevatedCard(onClick = { onJob(job) }, modifier = Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(job.title, modifier = Modifier.weight(1f),
+                                fontWeight = FontWeight.Bold)
+                            Text(money(state.remaining(job)), color = Blue,
+                                fontWeight = FontWeight.Bold)
+                        }
+                        Text("Termin: " + shownDate(job.start) + " – " + shownDate(job.end),
+                            style = MaterialTheme.typography.bodySmall)
+                        Text((STATUS[job.status] ?: job.status) +
+                            " · Uzgodniono: " + money(job.cents),
+                            style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))
     }
 }
 
