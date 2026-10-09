@@ -110,3 +110,19 @@ fun plannedValue(jobs: List<Job>, start: LocalDate, end: LocalDate): Long =
 
 fun received(payments: List<Payment>, start: LocalDate, end: LocalDate): Long =
     payments.filter { it.paidAt >= start && it.paidAt <= end }.sumOf { it.cents }
+
+
+/**
+ * Wartość umów oznaczonych DONE z planowanym końcem w okresie.
+ * Job nie przechowuje rzeczywistej daty zakończenia, więc nie wolno
+ * nazywać tego sumą wpłat ani rzeczywistym przychodem gotówkowym.
+ */
+fun completedValue(jobs: List<Job>, start: LocalDate, end: LocalDate): Long =
+    jobs.filter { it.status == "DONE" && it.end >= start && it.end <= end }.sumOf { it.cents }
+
+fun completedTotal(jobs: List<Job>): Long =
+    jobs.filter { it.status == "DONE" }.sumOf { it.cents }
+
+fun completedOutstanding(snapshot: Snapshot): Long =
+    snapshot.jobs.filter { it.status == "DONE" }
+        .sumOf { snapshot.remaining(it).coerceAtLeast(0L) }

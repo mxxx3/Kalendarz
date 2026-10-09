@@ -13,11 +13,17 @@ Natywna aplikacja w języku polskim do planowania robót remontowych, usług i p
 - Nazwa, zakres dat, cena całej pracy (€), adres, notatki, klient i status.
 - Kartoteka klientów z numerem i adresem, archiwizacja i historia przypisanych robót.
 - Zaliczki i wpłaty; automatyczne sumowanie otrzymanych kwot i salda.
-- Panel finansowy: wartość umów rozpoczętych w miesiącu, wpłaty w miesiącu, zaległości.
+- Panel finansowy: wartość umów rozpoczętych w miesiącu, **wartość prac oznaczonych „Zrobione”** (według planowanej daty zakończenia), faktyczne wpłaty i należności — bez mylenia wykonania z zapłatą.
+- W kalendarzu dni tygodnia mają czytelne daty w formacie `dd.MM`, a paski zleceń nie zasłaniają numerów dni.
+- Finanse pokazują terminy, status i saldo każdej nieopłaconej roboty oraz filtr „Zrobione” / „Pozostałe”.
 - Lokalne przechowywanie w SQLite, praca bez internetu i konta.
 - Opcjonalny tryb współdzielony: osobne konta Firebase Auth, przestrzenie ekip, nadawanie uprawnień przez UID, wspólne dane Firestore z aktualizacjami na bieżąco i buforowaniem zmian offline.
 - Eksport i import kopii JSON z walidacją i atomowym przywracaniem danych.
 - Testy jednostkowe logiki dat i kwot, workflow GitHub Actions budujący debug APK.
+
+## Ważne o zarobkach i wpłatach
+
+Status **Zrobione** oznacza wykonaną pracę, ale **nie dopisuje automatycznie zapłaty**. Nowe podsumowanie ukończonych prac obejmuje kwoty takich zleceń, a karta **Wpłaty otrzymane** sumuje wyłącznie wpłaty dodane ręcznie. System nie zna jeszcze rzeczywistej daty ukończenia — grupuje zakończone zlecenia w miesiącu według ich zaplanowanej daty końcowej. Dzięki temu liczby nie udają otrzymanej gotówki.
 
 ## Kompilacja i instalacja
 

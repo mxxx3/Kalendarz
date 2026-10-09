@@ -85,6 +85,8 @@ fun CalendarScreen(
                             modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 5.dp)) {
                             Column(Modifier.padding(16.dp)) {
                                 Text(j.title, fontWeight = FontWeight.Bold)
+                                Text("Termin: " + shownDate(j.start) + " – " + shownDate(j.end),
+                                    style = MaterialTheme.typography.bodySmall)
                                 Text("Dzień " + (ChronoUnit.DAYS.between(j.start,selected)+1) +
                                     " z " + days(j) + " · " + (STATUS[j.status] ?: j.status))
                                 Text("Cała robota: " + money(j.cents), color = Blue)
@@ -118,7 +120,12 @@ fun CalendarScreen(
                             modifier = Modifier.fillMaxWidth().padding(4.dp)) {
                             Row(Modifier.fillMaxWidth().padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically) {
-                                Text(job.title, Modifier.weight(1f), fontWeight = FontWeight.Bold)
+                                Column(Modifier.weight(1f)) {
+                                    Text(job.title, fontWeight = FontWeight.Bold)
+                                    Text(shownDate(job.start) + " – " + shownDate(job.end) +
+                                        " · " + (STATUS[job.status] ?: job.status),
+                                        style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                                }
                                 Text(money(job.cents), color = Blue)
                             }
                         }
@@ -141,7 +148,10 @@ private fun PlannerWeek(
     val visible = entries.filter { it.lane < maxLanes }
     val maxLane = (visible.maxOfOrNull { it.lane } ?: -1) + 1
     val cellHeight = if(compact) 23.dp else 38.dp
-    val gridHeight = 34.dp + (maxLane.coerceAtLeast(1) * cellHeight.value).dp +
+    // Rezerwujemy pełny nagłówek na nazwę dnia i datę (dd.MM).
+    // Paski MUSZĄ zaczynać się pod datami; wcześniejsze y=35.dp zasłaniało liczby.
+    val headerHeight = 64.dp
+    val gridHeight = headerHeight + (maxLane.coerceAtLeast(1) * cellHeight.value).dp +
         if(compact) 24.dp else 16.dp
     ElevatedCard(Modifier.fillMaxWidth().padding(vertical = 5.dp)) {
         BoxWithConstraints(Modifier.fillMaxWidth().height(gridHeight)
@@ -155,20 +165,25 @@ private fun PlannerWeek(
                             .background(if(date == selected) Color(0xFFE6F0FF)
                                 else if(index % 2 == 0) Color(0xFFF9FBFE) else Color.White)
                             .clickable { onDate(date) }
-                            .padding(top = 4.dp),
+                            .padding(top = 8.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(dayLabels[index], fontSize = 10.sp, color = Color.DarkGray)
-                        Text(date.dayOfMonth.toString(), fontSize = 12.sp,
-                            fontWeight = if(date == selected) FontWeight.Bold else FontWeight.Normal)
+                        Text(dayLabels[index], fontSize = 11.sp, color = Color.DarkGray)
+                        Text(date.format(DateTimeFormatter.ofPattern("dd.MM")),
+                            fontSize = 12.sp,
+                            color = if (date == selected) Blue else Color(0xFF172235),
+                            fontWeight = if(date == selected || date == LocalDate.now())
+                                FontWeight.ExtraBold else FontWeight.SemiBold,
+                            maxLines = 1)
                     }
                 }
             }
             visible.forEach { seg ->
-                val tint = barPalette[Math.floorMod(seg.job.id.hashCode(), barPalette.size)]
+                val tint = if (seg.job.status == "DONE") Color(0xFFC3ECD2)
+                    else barPalette[Math.floorMod(seg.job.id.hashCode(), barPalette.size)]
                 Box(
                     Modifier.offset(x = cellWidth * seg.offset,
-                        y = 35.dp + (seg.lane * cellHeight.value).dp)
+                        y = headerHeight + (seg.lane * cellHeight.value).dp)
                         .width(cellWidth * seg.span - 2.dp)
                         .height(cellHeight - 3.dp)
                         .clip(RoundedCornerShape(6.dp))
@@ -177,7 +192,8 @@ private fun PlannerWeek(
                         .padding(horizontal = 4.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    Text(if(compact) seg.job.title else seg.job.title + " · " + money(seg.job.cents),
+                    val label = (if (seg.job.status == "DONE") "✓ " else "") + seg.job.title
+                    Text(if(compact) label else label + " · " + money(seg.job.cents),
                         fontSize = if(compact) 10.sp else 12.sp, lineHeight = 12.sp,
                         maxLines = if(compact) 1 else 2,
                         overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold,
