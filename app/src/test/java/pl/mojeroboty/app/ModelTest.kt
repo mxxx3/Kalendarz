@@ -83,4 +83,42 @@ class ModelTest {
         val a=job("leap","2028-02-28","2028-03-01")
         assertEquals(3L,days(a))
     }
+
+    @Test fun completedJobsAreCountedByPlannedEndDateNotPaymentDate() {
+        val finishedInSeptember = job("sept","2026-09-29","2026-09-29",35000)
+            .copy(status = "DONE")
+        val septemberToOctober = job("oct1","2026-09-30","2026-10-02",105000)
+            .copy(status = "DONE")
+        val octoberDone = job("oct2","2026-10-05","2026-10-05",45000)
+            .copy(status = "DONE")
+        val octoberDone2 = job("oct3","2026-10-08","2026-10-08",30000)
+            .copy(status = "DONE")
+        val octoberPlanned = job("planned","2026-10-06","2026-10-14",160000)
+        val all = listOf(finishedInSeptember, septemberToOctober,
+            octoberDone, octoberDone2, octoberPlanned)
+        assertEquals(180000L,completedValue(all,d("2026-10-01"),d("2026-10-31")))
+        assertEquals(215000L,completedTotal(all))
+        assertEquals(0L,received(emptyList(),d("2026-10-01"),d("2026-10-31")))
+    }
+
+    @Test fun completedButUnpaidJobIsStillReceivable() {
+        val completed = job("complete","2026-10-05","2026-10-05",45000).copy(status = "DONE")
+        val open = job("open","2026-10-06","2026-10-09",60000)
+        val state = Snapshot(listOf(completed,open),emptyList(),
+            listOf(Payment("partial","complete",10000,d("2026-10-06"))),true)
+        assertEquals(35000L,completedOutstanding(state))
+        assertEquals(45000L,completedTotal(state.jobs))
+        assertEquals(10000L,state.paid(completed))
+        assertEquals(35000L,state.remaining(completed))
+        assertEquals(95000L,state.jobs.sumOf { state.remaining(it) })
+    }
+
+    @Test fun cancelledJobIsNotCompleted() {
+        val cancelled = job("cancelled","2026-10-01","2026-10-02",50000)
+            .copy(status = "CANCELLED")
+        val planned = cancelled.copy(id = "future", status = "PLANNED")
+        assertEquals(0L,completedValue(listOf(cancelled,planned),
+            d("2026-10-01"),d("2026-10-31")))
+    }
+
 }
